@@ -22,11 +22,6 @@ jobs:
         key: ${{ runner.os }}-dub-${{ hashFiles('**/dub.json') }}
         restore-keys: |
           ${{ runner.os }}-dub-
-    - name: Lint
-      id: lint
-      run: dub lint
-    - name: Build Dependencies
-      run: make blend2d
     - name: Cache Blend2D Artifacts (Posix)
       if: runner.os == 'Linux' || runner.os == 'macOS'
       uses: actions/cache@v2
@@ -35,6 +30,11 @@ jobs:
         key: ${{ runner.os }}-blend2d-${{ hashFiles('lib/blend2d/build/**/*.*') }}
         restore-keys: |
           ${{ runner.os }}-blend2d-
+    - name: Lint
+      id: lint
+      run: dub lint
+    - name: Build Dependencies
+      run: make blend2d
     - name: Test
       id: tests
       if: always() # Run tests even if lint step fails
