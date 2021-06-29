@@ -1,0 +1,14 @@
+{
+  "name": "css",
+  "description": "CSS 2.1 parser for the Gooey library",
+	"authors": [
+		"Chance Snow"
+	],
+  "license": "MIT",
+	"copyright": "Copyright © 2021, Chance Snow",
+  "targetName": "gen-css-parser",
+  "targetPath": "../../bin",
+	"dependencies": {
+		"pegged": "~>0.4.5"
+	}
+}

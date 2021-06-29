@@ -13,7 +13,7 @@
 		"bindbc-blend2d": "~>0.0.1127",
 		"libasync": "~>0.8.6",
 		"libdominator": "~>1.1.7",
-		"pc4d": "~>1.0.6"
+		"pegged": "~>0.4.5"
 	},
   "subConfigurations": {
     "bindbc-blend2d": "static"
@@ -21,5 +21,9 @@
   "lflags": [
     "-lstdc++",
     "-Llib/blend2d/build"
+  ],
+  "preGenerateCommands": [
+    "cd parsers/css && dub build",
+    "./bin/gen-css-parser"
   ]
 }

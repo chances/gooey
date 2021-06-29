@@ -1,5 +1,8 @@
 lib/blend2d/
 
+# Generated Sources
+source/gooey/css/parser.d
+
 # Compiled Object files
 *.o
 *.obj
@@ -14,6 +17,7 @@ lib/blend2d/
 *.lib
 
 # Executables
+bin/gen-css-parser
 bin/gooey-test-library
 *.exe
 
