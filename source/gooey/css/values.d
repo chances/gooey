@@ -22,7 +22,7 @@ enum Unit {
   radians,
 }
 
-string unitName(Unit unit) @property {
+string getName(Unit unit) @property {
   switch (unit) {
     case Unit.unitless:
       return "Unitless";
@@ -83,8 +83,8 @@ class Length : Value {
 
   override string toString() const {
     import std.string : format;
-    if (unit == Unit.unitless) return "%f %s".format!(value, unitName(unit));
-    return "%f %s (%s)".format!(value, unitName(unit), unit.notation());
+    if (unit == Unit.unitless) return format!"%f %s"(value, unit.getName());
+    return format!"%f %s (%s)"(value, unit.getName(), unit.notation());
   }
 }
 
