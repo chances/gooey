@@ -11,6 +11,10 @@ abstract class Value {
   }
 }
 
+unittest {
+  assert(new Length(-4, Unit.pixels).pixels == -4);
+}
+
 enum Unit {
   unitless,
   percentage,
@@ -82,18 +86,29 @@ class Length : Value {
   }
 
   override string toString() const {
-    import std.string : format;
-    if (unit == Unit.unitless) return format!"%f %s"(value, unit.getName());
-    return format!"%f %s (%s)"(value, unit.getName(), unit.notation());
+    import std.string : format, stripRight;
+    const result = value == 0
+      ? format!"0 %s"(unit.getName())
+      : value % 1 == 0
+        ? format!"%d %s"(value.to!long, unit.getName())
+          // Strip trailing zeroes from printed floating point lengths
+        : format!"%s %s"(format!"%f"(value).stripRight("0"), unit.getName());
+    return unit == Unit.unitless ? result : format!"%s (%s)"(result, unit.notation());
   }
 }
 
 unittest {
   const zero = Length.zero(Unit.unitless);
-  assert(zero.toString() == "0 Unitless");
+  assert(hashOf(zero.toString()) == hashOf("0 Unitless"), "Got " ~ zero.toString());
 
-  const length = new Length(12, Unit.pixels);
-  assert(length.toString() == "12 Pixels (px)");
+  assert(hashOf(new Length(72, Unit.percentage).toString()) == hashOf("72 Percentage (%)"));
+  assert(hashOf(new Length(840, Unit.ems).toString()) == hashOf("840 Ems (em)"));
+  assert(hashOf(new Length(1.5, Unit.rems).toString()) == hashOf("1.5 Relative Ems (rem)"));
+  assert(hashOf(new Length(12, Unit.points).toString()) == hashOf("12 Points (pt)"));
+  assert(hashOf(new Length(-4, Unit.pixels).toString()) == hashOf("-4 Pixels (px)"));
+  assert(hashOf(new Length(12, Unit.degrees).toString()) == hashOf("12 Degrees (deg)"));
+  import std.math : PI;
+  assert(hashOf(new Length(PI, Unit.radians).toString()) == hashOf("3.141593 Radians (rad)"));
 }
 
 class String : Value {
@@ -136,9 +151,9 @@ class Keyword : Value {
 unittest {
   assert(Keyword.auto_ == new Keyword("auto"));
   assert(Keyword.auto_ == Keyword.auto_);
-  assert(Keyword.auto_ != null);
+  assert(Keyword.auto_ !is null);
   assert(Keyword.auto_ != new Length(0));
 
-  keyword = new Keyword("orange");
+  auto keyword = new Keyword("orange");
   assert(Keyword.auto_ != keyword);
 }
