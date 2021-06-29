@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>API Reference - Gooey</title>
+		<link rel="stylesheet" type="text/css" href="./styles/ddox.css"/>
+		<link rel="stylesheet" href="./prettify/prettify.css" type="text/css"/>
+		<script type="text/javascript" src="./scripts/jquery.js">/**/</script><script type="text/javascript" src="./scripts/ddox.js">/**/</script>
+	</head>
+	<body onload="setupDdox();">
+<nav id="main-nav">
+  <h1>Gooey</h1>
+  <ul style="list-style: none; padding: 0;">
+    <li>
+      <a href="https://chances.github.io/gooey#Usage">Documentation</a>
+    </li>
+    <li>
+      <a href="https://chances.github.io/gooey">API Reference</a>
+    </li>
+    <li>
+      <a href="https://code.dlang.org/packages/gooey">Download</a>
+    </li>
+    <li>
+      <a href="https://github.com/chances/gooey#readme">Open Source on GitHub</a>
+    </li>
+  </ul>
+  <h2>API Reference</h2>
+			<noscript>
+				<p style="color: red">The search functionality needs JavaScript enabled</p>
+			</noscript>
+			<div id="symbolSearchPane" style="display: none">
+				<form action="#" method="GET">
+					<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(40);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();"/>
+				</form>
+				<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="./symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "./";
+$('#symbolSearchPane').show();</script>
+			</div>
+			<ul class="tree-view">
+			</ul>
+		</nav>
+		<div id="main-contents">
+<style>
+.bs-hbtn {
+  display: inline-block;
+  color: white;
+  height: 34pt;
+  vertical-align: top;
+  text-align: center;
+  float: right;
+}
+.bs-hbtn.red.left {
+  background: #ab1919;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: 100% 34pt, 100% 18pt, 18.5pt 34pt;
+  background-position: 0 0, 18pt 34pt, 0 0;
+  background-clip: content-box, border-box, border-box;
+}
+.bs-hbtn.black.right {
+  background: black;
+  margin-right: 18pt;
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 34pt, 100% 18pt, 18.5pt 34pt;
+  background-position: 0 0, -18pt 34pt, 100% 0;
+  background-clip: content-box, border-box, border-box;
+}
+.dub-logo {
+  background-image: url(images/dub-logo.png);
+  width: 56px;
+  height: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+#downloadButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+#downloadButton large {
+  font-size: 14pt;
+  line-height: 16pt;
+}
+#downloadButton .content {
+  padding: 0 5pt;
+}
+</style>
+
+<a id="downloadButton" href="https://code.dlang.org/packages/gooey">
+  <div class="bs-hbtn right black">
+    <div class="content">get <strong>teraflop</strong><br><large>0.8.0</large></div>
+  </div><div class="bs-hbtn left red">
+    <div class="dub-logo"></div>
+  </div>
+</a>
+
+<h1>Gooey API Reference</h1>
+<p>
+  <a href="https://code.dlang.org/packages/gooey">
+    <img src="https://img.shields.io/dub/v/teraflop.svg" alt="DUB Package">
+  </a>
+  <a target="_blank" href="https://opensource.org/licenses/BSD-3-Clause">
+    <img src="https://img.shields.io/badge/license-3--Clause%20BSD-blue" alt="3&dash;Clause BSD License">
+  </a>
+  <a target="_blank" rel="noopener noreferrer" href="https://github.com/chances/gooey/workflows/Gooey%20CI/badge.svg?branch=master">
+    <img src="https://github.com/chances/gooey/workflows/Gooey%20CI/badge.svg?branch=master" alt="Gooey CI">
+  </a>
+  <a href="https://codecov.io/gh/chances/gooey/">
+    <img src="https://codecov.io/gh/chances/gooey/branch/master/graph/badge.svg" alt="codecov">
+  </a>
+</p>
+<p>An ECS game engine on a <a href="https://github.com/rtbo/gfx-d#readme">Vulkan</a> foundation.</p>
+<h2 id="Usage">Usage</h2>
+<pre class="json">
+"dependencies": {
+  "teraflop": "0.8.0"
+}
+</pre>
+<h2>Examples</h2>
+<p>
+  <ul>
+    <li><a href="https://github.com/chances/gooey/blob/master/examples/triangle/source/app.d">`dub run teraflop:triangle`</a></li>
+    <li><a href="https://github.com/chances/gooey/blob/master/examples/cube/source/app.d">`dub run teraflop:cube`</a></li>
+  </ul>
+</p>
+<h2>Modules</h2>
+			<table>
+				<col class="caption"/>
+				<tr>
+					<th>Module</th><th>Description</th>
+				</tr>
+			</table>
+			<footer>
+<div style="display: flex; justify-content: space-between; margin-top: 2em;">
+  <a href="https://github.com/chances/gooey#readme">GitHub</a>
+  <span class="faint" style="float: right;">Generated using <a href="https://code.dlang.org/packages/ddox">DDOX</a></span>
+</div>
+			</footer>
+		</div>
+	</body>
+</html>
