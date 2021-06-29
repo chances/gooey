@@ -20,7 +20,7 @@ void main()
     simpleSelector  <- elementName ( hash / class_ / attribute / pseudo )*
     elementName     <-  identifier / '*'
     class_           <- '.' identifier
-    attribute       <- '[' _* identifier _* ( ( '=' / includes / dashMatch ) _* ( identifier / string ) _* )? ']'
+    attribute       <- '[' _* identifier _* ( ( '=' / includes / dashMatch ) _* ( identifier / string_ ) _* )? ']'
     pseudo          <- ':' ( identifier / identifier '(' _* (identifier _*)? ')' )
 
     declarations  <- declaration? ( ';' _* declaration? )*
@@ -28,7 +28,7 @@ void main()
     property <- identifier _*
 
     expr <- term ( operator? term )*
-    term <- unary_operator? unit _* / string _* / identifier _* / uri _* / hexcolor / function_
+    term <- unary_operator? unit _* / string_ _* / identifier _* / uri _* / hexcolor / function_
     unit <- number / percent / length / ems / ex / angle / time / frequency
     function_ <- identifier '(' _* (identifier _*)? ')'
     unary_operator <- '-' / '+'
@@ -40,30 +40,37 @@ void main()
 
     hex           <- [0-9a-f]
     unicode       <-		'\\' unicodePoint ( '\r\n' / [ \t\r\n] )?
-    unicodePoint  <- hex{1,6}
-    escape  <- unicode / '\\' [^\r\n0-9a-f]
-    string1 <- '\"' ([^\n\r\"] / escape)* '\"'
-    string2 <- '\'' ([^\n\r\'] / escape)* '\''
-    string_ <- string1  / string2
+    unicodePoint  <- hex hex hex hex hex hex / hex hex hex hex hex / hex hex hex hex / hex hex hex / hex hex / hex
+    escape    <- unicode / (backslash ![\r\n0-9a-f] .)
+    stringChar <- escape / (![\n\r\"] .)
+    string1   <- :doublequote stringChar* :doublequote
+    string2   <- :quote stringChar* :quote
+    string_   <- string1  / string2
+    unclosedString1   <- doublequote stringChar* backslash?
+    unclosedString2   <- quote stringChar* backslash?
+    unclosedString    <- unclosedString1 / unclosedString2
     url           <- ([!#$%&*-~] / escape)*
-    uri           <- "url(" w string w ")" / "url(" w url w ")"
+    uri           <- "url(" w string_ w ")" / "url(" w url w ")"
     unclosedUri1  <- 'url(' _ ([!#$%&*-\[\]-~] / escape)* _
-    unclosedUri2  <- 'url(' _ string _
-    unclosedUri3  <- 'url(' _ {badstring}
+    unclosedUri2  <- 'url(' _ string_ _
+    unclosedUri3  <- 'url(' _ unclosedString
     unclosedUri   <- unclosedUri1 / unclosedUri2 / unclosedUri3
-    # comment           <- '/*' [^*]* '*'+ ([^/*][^*]*\*+)* '/'
-    # unclosedComment1  <- '/*' [^*]* '*'+ ([^/*][^*]*\*+)*
-    # unclosedComment2  <- '/*' [^*]* (\*+[^/*][^*]*)*
+    # TODO: Use negative lookahead for comments
+    # comment           <- '/*' [^*]* '*'+ ( [^/*] [^*]* '\*'+ )* '/'
+    # unclosedComment1  <- '/*' [^*]* '*'+ ( [^/*] [^*]* '\*'+ )*
+    # unclosedComment2  <- '/*' [^*]* ( \*+[^/*][^*]* )*
     # unclosedComment   <- unclosedComment1 / unclosedComment2
     nameChar    <- [_a-z0-9-] / escape
-    identifier  <- '-'? [A-Za-z_] [A-Za-z0-9_-]*
+    nameHead    <- [A-Za-z_]
+    nameTail    <- [A-Za-z0-9_] / '-'
+    identifier  <- '-'? nameHead nameTail*
     number <-		[0-9]+ / [0-9]* "." [0-9]+
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
     w <- _?
 
     hash <- '#' nameChar+
-    hexcolor <- '#' hex*
+    hexcolor <- '#' hex hex hex hex hex hex / '#' hex hex hex
     includes <- "~="
     dashMatch <- "|="
 
