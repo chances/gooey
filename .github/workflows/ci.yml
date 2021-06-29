@@ -1,0 +1,45 @@
+name: Gooey CI
+
+on: push
+
+jobs:
+  test:
+    name: Tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install D compiler
+      uses: dlang-community/setup-dlang@v1
+      with:
+        compiler: ldc-latest
+    - name: Cache DUB Artifacts (Posix)
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      uses: actions/cache@v2
+      with:
+        path: ~/.dub
+        key: ${{ runner.os }}-dub-${{ hashFiles('**/dub.json') }}
+        restore-keys: |
+          ${{ runner.os }}-dub-
+    - name: Lint
+      id: lint
+      run: dub lint
+    - name: Build Dependencies
+      run: make blend2d
+    - name: Cache Blend2D Artifacts (Posix)
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      uses: actions/cache@v2
+      with:
+        path: lib/blend2d
+        key: ${{ runner.os }}-blend2d-${{ hashFiles('lib/blend2d/build/**/*.*') }}
+        restore-keys: |
+          ${{ runner.os }}-blend2d-
+    - name: Test
+      id: tests
+      if: always() # Run tests even if lint step fails
+      run: dub test --parallel --coverage
+    - name: Upload Coverage to Codecov
+      # Upload test coverage even if lint step fails
+      if: success() || (steps.lint.outcome == 'failure' && steps.tests.outcome == 'success')
+      run: bash <(curl -s https://codecov.io/bash)

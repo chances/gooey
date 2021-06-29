@@ -1,0 +1,28 @@
+lib/blend2d/
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+bin/gooey-test-library
+*.exe
+
+# DUB
+/dub.selections.json
+.dub
+docs.json
+__dummy.html
+docs/
+
+# Code coverage
+*.lst
