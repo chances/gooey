@@ -56,14 +56,13 @@ void main()
     # unclosedComment2  <- '/*' [^*]* (\*+[^/*][^*]*)*
     # unclosedComment   <- unclosedComment1 / unclosedComment2
     nameChar    <- [_a-z0-9-] / escape
-    name        <- nameChar+
     identifier  <- '-'? [A-Za-z_] [A-Za-z0-9_-]*
     number <-		[0-9]+ / [0-9]* "." [0-9]+
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
     w <- _?
 
-    hash <- '#' name
+    hash <- '#' nameChar+
     hexcolor <- '#' hex*
     includes <- "~="
     dashMatch <- "|="
