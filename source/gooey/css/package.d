@@ -1,8 +1,11 @@
 module gooey.css;
 
-public import gooey.css.parser;
-public import gooey.css.selectors;
-public import gooey.css.values;
+public {
+  import gooey.ast : SyntaxError;
+  import gooey.css.parser;
+  import gooey.css.selectors;
+  import gooey.css.values;
+}
 
 alias RuleSet = Rule[];
 
@@ -19,4 +22,8 @@ struct Declaration {
   string name;
   Value[] values;
   bool important;
+}
+
+Stylesheet parse(string input) {
+  assert(0, "Unimplemented!");
 }

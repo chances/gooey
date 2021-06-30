@@ -1,9 +1,11 @@
 module gooey.css.selectors;
 
+import pegged.peg : ParseTree, Position, position;
 import std.algorithm : cmp;
 import std.conv : to;
 
-import gooey.css : ParserException;
+import gooey.ast;
+import gooey.css : SyntaxError;
 
 struct Specificity {
   const uint tagParts;
@@ -27,27 +29,37 @@ struct Specificity {
   }
 }
 
-abstract class Selector {
+/// An abstract CSS selector.
+/// SeeAlso: `SimpleSelector`
+abstract class Selector : Node {
   const Specificity specificity;
 
-  this(Specificity specificity) {
+  this(Specificity specificity, const Position* position = null) {
+    super(position);
     this.specificity = specificity;
   }
 
   static Selector parse(string input) {
     import gooey.css.parser : CSS, GetName;
+    import std.array : join;
+    import std.functional : toDelegate;
 
-    assert(input !is null && input.length > 0, "Expected non-null, non-empty input!");
-    const ast = CSS.decimateTree(CSS.selector(input));
-    if (!ast.successful) throw new ParserException(ast.failMsg());
-
-    import std.stdio : writeln;
-    writeln(ast.toString());
+    const ast = CSS.selector(input.enforceContentful()).decimate!CSS();
+    if (!ast.successful) throw new SyntaxError(ast);
 
     assert(ast.name.cmp(CSS.selector(GetName())) == 0);
-    if (ast.children[0].name.cmp(CSS.simpleSelector(GetName())) == 0) return SimpleSelector.fromTag(ast.matches[0]);
+    const selector = ast.enforceChildNamed(&CSS.simpleSelector);
+    string id = null;
+    string elementName = null;
+    string[] classes;
+    foreach (node; selector.children) {
+      if (node.isNamed(&CSS.hash)) id = node.matches[1..$].join();
+      else if (node.isNamed(&CSS.elementName)) elementName = node.matches.join();
+      else if (node.isNamed(&CSS.class_)) classes ~= node.matches[1..$].join();
+    }
 
-    assert(0, "Unimplemented");
+    const position = position(ast);
+    return new SimpleSelector(elementName, id, classes, &position);
   }
 
   override int opCmp(const Object o) const {
@@ -69,39 +81,47 @@ abstract class Selector {
 }
 
 unittest {
+  import std.algorithm : equal;
   import std.exception : assertNotThrown, assertThrown;
 
-  assertThrown!ParserException(Selector.parse("0"));
-  assertNotThrown!ParserException(assert(Selector.parse("*").to!SimpleSelector.isUniversalSelector));
+  assertThrown!SyntaxError(Selector.parse("0"));
+  assertNotThrown!SyntaxError(assert(Selector.parse("*").to!SimpleSelector.isUniversalSelector));
 
-  string selectElement(string input) {
-    const selector = Selector.parse(input);
-    assert(typeid(SimpleSelector).isBaseOf(selector.classinfo));
-    return selector.to!(const SimpleSelector).tagName;
-  }
+  auto div = assertNotThrown!SyntaxError(Selector.parse("div"));
+  assert(typeid(SimpleSelector).isBaseOf(div.classinfo));
+  assert(div.to!SimpleSelector.elementName.cmp("div") == 0);
 
-  assertNotThrown!ParserException(assert(selectElement("div").cmp("div") == 0));
+  div = assertNotThrown!SyntaxError(Selector.parse("div.hidden"));
+  assert(div.to!SimpleSelector.elementName.cmp("div") == 0);
+  assert(div.to!SimpleSelector.classes.equal(["hidden"]));
+
+  auto widget = assertNotThrown!SyntaxError(Selector.parse("#myWidget.hidden"));
+  assert(widget.to!SimpleSelector.id.cmp("myWidget") == 0);
+  assert(widget.to!SimpleSelector.classes.equal(["hidden"]));
 }
 
 class SimpleSelector : Selector {
-  const string tagName;
+  const string elementName;
   const string id;
   const string[] classes;
 
-  this(string[] classes) { this(null, null, classes); }
-  this(string tagName, string id, string[] classes) {
-    super(Specificity(
-      tagName is null ? 0 : 1,
-      id is null ? 0 : 1,
-      classes.length.to!uint)
+  this(string[] classes, ParseTree* node = null) { this(null, null, classes); }
+  this(string elementName, string id, string[] classes, const Position* position = null) {
+    super(
+      Specificity(
+        elementName is null ? 0 : 1,
+        id is null ? 0 : 1,
+        classes.length.to!uint
+      ),
+      position
     );
-    this.tagName = tagName;
+    this.elementName = elementName;
     this.id = id;
     this.classes = classes;
   }
 
-  static fromTag(string tagName) {
-    return new SimpleSelector(tagName, null, new string[0]);
+  static fromTag(string elementName) {
+    return new SimpleSelector(elementName, null, new string[0]);
   }
 
   static fromId(string id) {
@@ -110,7 +130,7 @@ class SimpleSelector : Selector {
 
   /// Whether this is the universal selector, i.e.
   bool isUniversalSelector() @property const {
-    return this.tagName == "*";
+    return this.elementName == "*";
   }
 
   override bool hasClass(string className) const {
@@ -128,7 +148,7 @@ unittest {
   assert(SimpleSelector.fromId("usernameField").id.cmp("usernameField") == 0);
 
   const anchorSelector = SimpleSelector.fromTag("a");
-  assert(hashOf(anchorSelector.tagName) == hashOf("a"));
+  assert(hashOf(anchorSelector.elementName) == hashOf("a"));
   assert(anchorSelector.hasClass("hidden") == false);
 
   string[] classes = ["navbar", "hidden"];

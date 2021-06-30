@@ -17,7 +17,7 @@ void main()
     selectors       <- selector _ ',' _ selector / selector
     selector        <- simpleSelector ( combinator selector / _+ ( combinator? selector )? )?
     combinator      <- '+' _* / '>' _*
-    simpleSelector  <- elementName ( hash / class_ / attribute / pseudo )*
+    simpleSelector  <- elementName ( hash / class_ / attribute / pseudo )* / ( hash | class_ | attribute | pseudo )+
     elementName     <-  identifier / '*'
     class_           <- '.' identifier
     attribute       <- '[' _* identifier _* ( ( '=' / includes / dashMatch ) _* ( identifier / string_ ) _* )? ']'
@@ -60,16 +60,15 @@ void main()
     # unclosedComment1  <- '/*' [^*]* '*'+ ( [^/*] [^*]* '\*'+ )*
     # unclosedComment2  <- '/*' [^*]* ( \*+[^/*][^*]* )*
     # unclosedComment   <- unclosedComment1 / unclosedComment2
-    nameChar    <- [_a-z0-9-] / escape
     nameHead    <- [A-Za-z_]
-    nameTail    <- [A-Za-z0-9_] / '-'
+    nameTail    <- [A-Za-z0-9_] / '-' / escape
     identifier  <- ~('-'? nameHead nameTail*)
     number <-		[0-9]+ / [0-9]* "." [0-9]+
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
     w <- _?
 
-    hash <- '#' nameChar+
+    hash <- '#' ~(nameTail+)
     hexcolor <- '#' hex hex hex hex hex hex / '#' hex hex hex
     includes <- "~="
     dashMatch <- "|="
