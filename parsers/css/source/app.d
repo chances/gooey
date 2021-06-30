@@ -63,7 +63,7 @@ void main()
     nameChar    <- [_a-z0-9-] / escape
     nameHead    <- [A-Za-z_]
     nameTail    <- [A-Za-z0-9_] / '-'
-    identifier  <- '-'? nameHead nameTail*
+    identifier  <- ~('-'? nameHead nameTail*)
     number <-		[0-9]+ / [0-9]* "." [0-9]+
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
