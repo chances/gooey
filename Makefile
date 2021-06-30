@@ -11,12 +11,20 @@ lib/blend2d/build/libblend2d.a: lib/blend2d/CMakeLists.txt
 	cd lib/blend2d/build && \
 	cmake .. -DBLEND2D_STATIC=true -DBLEND2D_NO_INSTALL=true && \
 	cmake --build .
+	# TODO: Fix this sanity check
 	# @echo "Sanity check for static lib:"
 	# ld -Llib/blend2d/src -l glfw3
 	# rm -f a.out
 	# @echo "👍️"
 blend2d: lib/blend2d/build/libblend2d.a
 .PHONY: blend2d
+
+source/gooey/css/parser.d: parsers/css/source/app.d
+	@cd parsers/css && dub build
+	@./bin/gen-css-parser
+parsers: source/gooey/css/parser.d
+	@printf "\nRemember to remove header comments from the generated sources (./source/**/parser.d) so that the docs compile!\n\n"
+.PHONY: parsers
 
 docs/sitemap.xml: $(SOURCES)
 	dub build -b ddox
@@ -38,9 +46,11 @@ docs: docs/sitemap.xml
 .PHONY: docs
 
 clean: clean-docs
+	rm -f bin/gen-css-parser
 	rm -f bin/gooey-test-library
 	rm -f $(EXAMPLES)
 	rm -f -- *.lst
+	rm source/gooey/css/parser.d
 .PHONY: clean
 
 clean-docs:

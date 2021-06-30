@@ -22,8 +22,8 @@
     "-lstdc++",
     "-Llib/blend2d/build"
   ],
-  "preGenerateCommands": [
-    "cd parsers/css && dub build",
-    "./bin/gen-css-parser"
+  "-ddoxFilterArgs": [
+    "--min-protection=Protected",
+    "--only-documented"
   ]
 }
