@@ -75,8 +75,8 @@ struct GenericCSS(TParseTree)
         rules["time"] = toDelegate(&time);
         rules["frequency"] = toDelegate(&frequency);
         rules["em"] = toDelegate(&em);
-        rules["rem"] = toDelegate(&rem);
         rules["ex"] = toDelegate(&ex);
+        rules["rem"] = toDelegate(&rem);
         rules["px"] = toDelegate(&px);
         rules["cm"] = toDelegate(&cm);
         rules["mm"] = toDelegate(&mm);
@@ -1955,7 +1955,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(em, rem), "CSS.ems")(p);
+            return         pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems")(p);
         }
         else
         {
@@ -1963,7 +1963,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(em, rem), "CSS.ems"), "ems")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems"), "ems")(p);
                 memo[tuple(`ems`, p.end)] = result;
                 return result;
             }
@@ -1974,12 +1974,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(em, rem), "CSS.ems")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(em, rem), "CSS.ems"), "ems")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems"), "ems")(TParseTree("", false,[], s));
         }
     }
     static string ems(GetName g)
@@ -2167,42 +2167,6 @@ struct GenericCSS(TParseTree)
         return "CSS.em";
     }
 
-    static TParseTree rem(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`rem`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(p);
-                memo[tuple(`rem`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree rem(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(TParseTree("", false,[], s));
-        }
-    }
-    static string rem(GetName g)
-    {
-        return "CSS.rem";
-    }
-
     static TParseTree ex(TParseTree p)
     {
         if(__ctfe)
@@ -2237,6 +2201,42 @@ struct GenericCSS(TParseTree)
     static string ex(GetName g)
     {
         return "CSS.ex";
+    }
+
+    static TParseTree rem(TParseTree p)
+    {
+        if(__ctfe)
+        {
+            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(p);
+        }
+        else
+        {
+            if (auto m = tuple(`rem`, p.end) in memo)
+                return *m;
+            else
+            {
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(p);
+                memo[tuple(`rem`, p.end)] = result;
+                return result;
+            }
+        }
+    }
+
+    static TParseTree rem(string s)
+    {
+        if(__ctfe)
+        {
+            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(TParseTree("", false,[], s));
+        }
+        else
+        {
+            forgetMemo();
+            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(TParseTree("", false,[], s));
+        }
+    }
+    static string rem(GetName g)
+    {
+        return "CSS.rem";
     }
 
     static TParseTree px(TParseTree p)

@@ -82,16 +82,15 @@ void main()
     # Units
     #==================================#
     percent <- '%'
-    ems <- em / rem
+    ems <- em / ex / rem
     length <- px / cm / mm / in_ / pt / pc
     angle <- deg / rad / grad
     time <- ms / sec
     frequency <- hz / khz
-
-    em <- 'em'i    #	EMs
-    rem <- 'rem'i  # Relative EMs
-    ex <- 'ex'i    #	EXs
     #	Lengths
+    em  <- 'em'i    #	EMs
+    ex  <- 'ex'i    # x-height
+    rem <- 'rem'i   # Relative EMs
     px  <- 'px'i    #	Pixels
     cm  <- 'cm'i    #	Centimeters
     mm  <- 'mm'i    #	Millimeters
