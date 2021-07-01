@@ -18,6 +18,8 @@ struct Stylesheet {
   /// Parse a stylesheet given an `input` string.
   /// Throws: `SyntaxError` when an irrecoverable syntax error is encournterd.
   Stylesheet parse(string input) {
+    import gooey.ast : enforceContentful;
+
     try enforceContentful(input);
     catch (SyntaxError e) {
       if (input.length == 0) return Stylesheet([]);
@@ -39,7 +41,7 @@ struct Rule {
   Declaration[] declarations;
 }
 
-/// A CSS rule, i.e. a property and its `Value`(s).
+/// A CSS rule, i.e. a property and its `gooey.css.values.Value`(s).
 struct Declaration {
   /// Property name.
   string name;

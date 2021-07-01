@@ -38,7 +38,7 @@ struct Specificity {
 }
 
 /// An abstract CSS selector.
-/// SeeAlso: `SimpleSelector`
+/// See_Also: `SimpleSelector`
 abstract class Selector : Node {
   /// Specificity weight of this selector.
   const Specificity specificity;

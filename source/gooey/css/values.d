@@ -7,6 +7,11 @@ import std.conv : to;
 import std.typecons : Flag, No;
 
 /// An abstract CSS value.
+/// See_Also: $(UL
+///   $(LI `Keyword`)
+///   $(LI `Length`)
+///   $(LI `Color`)
+/// )
 abstract class Value {
   float pixels() @property const {
     if (typeid(Length).isBaseOf(this.classinfo) && this.to!(const Length).unit == Unit.pixels)
@@ -16,7 +21,7 @@ abstract class Value {
   }
 
   /// Convert this value to its CSS representation.
-  abstract string toCSS();
+  abstract string toCSS() const;
 }
 
 unittest {
@@ -24,7 +29,7 @@ unittest {
 }
 
 /// Unit of measurement for a <a href="https://drafts.csswg.org/css2/#length-units">CSS Length</a>.
-/// SeeAlso: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
+/// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
 enum Unit {
   ///
   unitless,
@@ -32,7 +37,7 @@ enum Unit {
   /// which the percentage refers.
   percentage,
   /// The computed value of the `font-size` property of the element on which it is used.
-  /// SeeAlso: <a href="https://drafts.csswg.org/css2/#propdef-font-size">`font-size` Property</a> - CSS 2 Specification
+  /// See_Also: <a href="https://drafts.csswg.org/css2/#propdef-font-size">`font-size` Property</a> - CSS 2 Specification
   em,
   /// Often equal to the height of the lowercase "x". However, an ex is defined even for fonts that do not contain an "x".
   ex,
@@ -62,15 +67,15 @@ string getName(Unit unit) @property {
       return "Unitless";
     case Unit.percentage:
       return "Percentage";
-    case Unit.ems:
+    case Unit.em:
       return "Ems";
-    case Unit.rems:
+    case Unit.rem:
       return "Relative Ems";
-    case inches:
+    case Unit.inches:
       return "Inches";
-    case centimeters:
+    case Unit.centimeters:
       return "Centimeters";
-    case millimeters:
+    case Unit.millimeters:
       return "Millimeters";
     case Unit.points:
       return "Points";
@@ -93,19 +98,19 @@ string notation(Unit unit) @property {
       return "";
     case Unit.percentage:
       return "%";
-    case Unit.ems:
+    case Unit.em:
       return "em";
-    case Unit.rems:
+    case Unit.rem:
       return "rem";
-    case inches:
+    case Unit.inches:
       return "in";
-    case centimeters:
+    case Unit.centimeters:
       return "cm";
-    case millimeters:
+    case Unit.millimeters:
       return "mm";
     case Unit.points:
       return "pt";
-    case picas:
+    case Unit.picas:
       return "pc";
     case Unit.pixels:
       return "px";
@@ -119,10 +124,10 @@ string notation(Unit unit) @property {
 }
 
 /// A distnace measurement.
-/// SeeAlso: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
+/// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
 class Length : Value {
   /// Unit of measurement of this length's `value`.
-  /// SeeAlso: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
+  /// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
   const Unit unit;
   ///
   const double value;
@@ -139,7 +144,7 @@ class Length : Value {
   }
 
   ///
-  string toCSS() const {
+  override string toCSS() const {
     import std.conv : text;
     import std.string : format, stripRight;
     return text(value) ~ unit.notation();
@@ -174,7 +179,7 @@ unittest {
 }
 
 /// A string of text.
-/// SeeAlso: <a href="https://drafts.csswg.org/css2/#strings">Strings</a> - CSS 2 Specification
+/// See_Also: <a href="https://drafts.csswg.org/css2/#strings">Strings</a> - CSS 2 Specification
 class String : Value {
   ///
   const string value;
@@ -185,7 +190,7 @@ class String : Value {
   }
 
   ///
-  string toCSS(Flag!"singleQuotes" singleQuotes = No.singleQuotes) {
+  string toCSS(Flag!"singleQuotes" singleQuotes = No.singleQuotes) const {
     import std.string : replace;
 
     const quote = singleQuotes ? "'" : "\"";
@@ -199,7 +204,7 @@ class String : Value {
 }
 
 /// A reserved intentifier.
-/// SeeAlso: https://drafts.csswg.org/css2/#keywords
+/// See_Also: https://drafts.csswg.org/css2/#keywords
 class Keyword : Value {
   ///
   const string value;
@@ -213,8 +218,8 @@ class Keyword : Value {
   static const auto_ = new Keyword("auto");
 
   ///
-  string toCSS() {
-    return typeid(Color).isBaseOf(this.classinfo) ? this.to!Color.toCSS() : value;
+  override string toCSS() const {
+    return typeid(Color).isBaseOf(this.classinfo) ? this.to!(const Color).toCSS() : value;
   }
 
   ///
@@ -245,7 +250,7 @@ unittest {
 }
 
 /// Either a keyword or a numerical RGB(A) value.
-/// SeeAlso: https://drafts.csswg.org/css2/#color-units
+/// See_Also: https://drafts.csswg.org/css2/#color-units
 class Color : Keyword {
   /// Red component of this color.
   const byte r;
@@ -256,41 +261,45 @@ class Color : Keyword {
   /// Alpha component of this color. `0` is fully transparent. `255`/`0xFF` is fully opaque;
   const byte a;
 
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-aqua
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-aqua
   static const aqua = new Color("aqua", 0, 0xFF, 0xFF);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-black
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-black
   static const black = new Color("black", 0, 0, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-blue
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-blue
   static const blue = new Color("blue", 0, 0, 0xFF);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-fuchsia
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-fuchsia
   static const fuchsia = new Color("fuchsia", 0xFF, 0, 0xFF);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-gray
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-gray
   static const gray = new Color("gray", 0x80, 0x80, 0x80);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-green
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-green
   static const green = new Color("green", 0, 0x80, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-lime
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-lime
   static const lime = new Color("lime", 0, 0xFF, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-maroon
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-maroon
   static const maroon = new Color("maroon", 0x80, 0, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-navy
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-navy
   static const navy = new Color("navy", 0, 0, 0x80);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-olive
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-olive
   static const olive = new Color("olive", 0, 0x80, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-orange
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-orange
   static const orange = new Color("orange", 0xFF, 0xA5, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-purple
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-purple
   static const purple = new Color("purple", 0x80, 0, 0x80);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-red
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-red
   static const red = new Color("red", 0xFF, 0, 0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-silver
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-silver
   static const silver = new Color("silver", 0xC0, 0xC0, 0xC0);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-teal
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-teal
   static const teal = new Color("teal", 0, 0x80, 0x80);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-white
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-white
   static const white = new Color("white", 0xFF, 0xFF, 0xFF);
-  /// SeeAlso: https://drafts.csswg.org/css2/#valdef-color-yellow
+  /// See_Also: https://drafts.csswg.org/css2/#valdef-color-yellow
   static const yellow = new Color("yellow", 0xFF, 0xFF, 0);
 
+  /// Instantiate a reserved color `Keyword`.
+  this(string keyword, int r, int g, int b, int a = 0) {
+    this(keyword, cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a);
+  }
   /// Instantiate a reserved color `Keyword`.
   this(string keyword, byte r, byte g, byte b, byte a = 0) {
     super(keyword);
@@ -298,6 +307,10 @@ class Color : Keyword {
     this.g = g;
     this.b = b;
     this.a = a;
+  }
+  ///
+  this(int r, int g, int b, int a = 0) {
+    this(cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a);
   }
   ///
   this(byte r, byte g, byte b, byte a = 0) {
