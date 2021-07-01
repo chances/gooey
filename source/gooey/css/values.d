@@ -165,17 +165,19 @@ class Length : Value {
 }
 
 unittest {
-  const zero = Length.zero(Unit.unitless);
-  assert(hashOf(zero.toString()) == hashOf("0 Unitless"), "Got " ~ zero.toString());
+  import std.algorithm : equal;
 
-  assert(hashOf(new Length(72, Unit.percentage).toString()) == hashOf("72 Percentage (%)"));
-  assert(hashOf(new Length(840, Unit.ems).toString()) == hashOf("840 Ems (em)"));
-  assert(hashOf(new Length(1.5, Unit.rems).toString()) == hashOf("1.5 Relative Ems (rem)"));
-  assert(hashOf(new Length(12, Unit.points).toString()) == hashOf("12 Points (pt)"));
-  assert(hashOf(new Length(-4, Unit.pixels).toString()) == hashOf("-4 Pixels (px)"));
-  assert(hashOf(new Length(12, Unit.degrees).toString()) == hashOf("12 Degrees (deg)"));
+  const zero = Length.zero(Unit.unitless);
+  assert(zero.toString().equal("0 Unitless"), "Got " ~ zero.toString());
+
+  assert(new Length(72, Unit.percentage).toString().equal("72 Percentage (%)"));
+  assert(new Length(840, Unit.em).toString().equal("840 Ems (em)"));
+  assert(new Length(1.5, Unit.rem).toString().equal("1.5 Relative Ems (rem)"));
+  assert(new Length(12, Unit.points).toString().equal("12 Points (pt)"));
+  assert(new Length(-4, Unit.pixels).toString().equal("-4 Pixels (px)"));
+  assert(new Length(12, Unit.degrees).toString().equal("12 Degrees (deg)"));
   import std.math : PI;
-  assert(hashOf(new Length(PI, Unit.radians).toString()) == hashOf("3.141593 Radians (rad)"));
+  assert(new Length(PI, Unit.radians).toString().equal("3.14159 Radians (rad)"));
 }
 
 /// A string of text.
