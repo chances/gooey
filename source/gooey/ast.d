@@ -1,7 +1,24 @@
+/// Authors: Chance Snow
+/// Copyright: Copyright © 2021 Chance Snow. All rights reserved.
+/// License: MIT License
 module gooey.ast;
 
 import pegged.peg : GetName, ParseTree, Position, position;
 import std.exception : enforce;
+
+///
+abstract class Node {
+  /// Source position of this node.
+  const Position* sourcePosition;
+
+  /// Instantiate a new AST node.
+  ///
+  /// Params:
+  ///   sourcePosition = Source position of this node. Defaults to `null`.
+  this(const Position* sourcePosition = null) {
+    this.sourcePosition = sourcePosition;
+  }
+}
 
 string enforceContentful(string input) {
   if(input is null || input.length == 0) throw new SyntaxError("Expected non-null, non-empty input!");
@@ -18,18 +35,6 @@ ParseTree decimate(T)(ParseTree node) {
     writeln(node.successful ? simplifiedAst.toString() : [node.name, node.failMsg()].join(": "));
   }
   return simplifiedAst;
-}
-
-abstract class Node {
-  const Position* sourcePosition;
-
-  /// Instantiate a new AST node.
-  ///
-  /// Params:
-  ///   sourcePosition = Source position of this node. Defaults to `null`.
-  this(const Position* sourcePosition = null) {
-    this.sourcePosition = sourcePosition;
-  }
 }
 
 /// Thrown when a parser encounters a syntax error.
@@ -73,17 +78,11 @@ const(ParseTree) enforceChildNamed(const ParseTree node, string function(GetName
   ));
 }
 
-/// Format the given `node`'s name' for users.
-/// Params:
-///   node=
 string prettyName(ParseTree node) {
   import std.algorithm : joiner, splitter;
   return prettyName(node.name);
 }
 
-/// Format the given generated pegged rule name for users.
-/// Params:
-///   name=
 string prettyName(string name) {
   import std.algorithm : joiner, splitter;
   import std.array : array;

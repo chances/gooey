@@ -1,3 +1,6 @@
+/// Authors: Chance Snow
+/// Copyright: Copyright © 2021 Chance Snow. All rights reserved.
+/// License: MIT License
 module gooey.css.selectors;
 
 import pegged.peg : ParseTree, Position, position;
@@ -7,13 +10,18 @@ import std.conv : to;
 import gooey.ast;
 import gooey.css : SyntaxError;
 
+/// See_Also: <a href="https://drafts.csswg.org/css2/#specificity">Calculating a selector’s specificity</a> - CSS 2 Specification
 struct Specificity {
-  const uint tagParts;
+  /// Whether a `Selector` selects for an element.
+  const uint elementParts;
+  /// Whether a `Selector` selects for an ID.
   const uint idParts;
+  /// Number of selected class names selected by a `Selector`.
   const uint classParts;
 
+  /// Total calculated specificity weight of a `Selector`.
   auto total() @property const {
-    return tagParts + idParts + classParts;
+    return elementParts + idParts + classParts;
   }
 
   int opCmp(ref const Specificity s) const {
@@ -32,13 +40,16 @@ struct Specificity {
 /// An abstract CSS selector.
 /// SeeAlso: `SimpleSelector`
 abstract class Selector : Node {
+  /// Specificity weight of this selector.
   const Specificity specificity;
 
+  ///
   this(Specificity specificity, const Position* position = null) {
     super(position);
     this.specificity = specificity;
   }
 
+  /// Parse a selector given a string `input`.
   static Selector parse(string input) {
     import gooey.css.parser : CSS, GetName;
     import std.array : join;
@@ -77,6 +88,7 @@ abstract class Selector : Node {
     return hashOf(specificity.total);
   }
 
+  /// Whether this selector matches the given `className`.
   abstract bool hasClass(string className) const;
 }
 
@@ -100,12 +112,26 @@ unittest {
   assert(widget.to!SimpleSelector.classes.equal(["hidden"]));
 }
 
+// TODO: The elements of the document tree that match a selector are called subjects.
+
+/// Any combination of one <a href="https://drafts.csswg.org/css2/#type-selectors">type selector</a> or
+/// <a href="https://drafts.csswg.org/css2/#universal-selector">universal selector</a> including zero or more
+/// <a href="https://drafts.csswg.org/css2/#attribute-selectors">attribute selectors</a>, ID selectors, or
+/// pseudo-classes.
+///
+/// The simple selector matches if all of its components match.
+/// See_Also: https://drafts.csswg.org/css2/#simple-selector
 class SimpleSelector : Selector {
+  ///
   const string elementName;
+  ///
   const string id;
+  ///
   const string[] classes;
 
+  ///
   this(string[] classes, ParseTree* node = null) { this(null, null, classes); }
+  ///
   this(string elementName, string id, string[] classes, const Position* position = null) {
     super(
       Specificity(
@@ -120,19 +146,23 @@ class SimpleSelector : Selector {
     this.classes = classes;
   }
 
+  /// Instantiate a new simple selector given an element's name.
   static fromTag(string elementName) {
     return new SimpleSelector(elementName, null, new string[0]);
   }
 
+  /// Instantiate a new simple selector given an element's ID.
   static fromId(string id) {
     return new SimpleSelector(null, id, new string[0]);
   }
 
-  /// Whether this is the universal selector, i.e.
+  /// Whether this is the universal selector, i.e. it matches any single element in the document.
+  /// See_Also: https://drafts.csswg.org/css2/#universal-selector
   bool isUniversalSelector() @property const {
     return this.elementName == "*";
   }
 
+  /// Whether this selector matches the given `className`.
   override bool hasClass(string className) const {
     import std.algorithm : any;
     import std.uni : icmp;
