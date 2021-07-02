@@ -68,28 +68,14 @@ struct GenericCSS(TParseTree)
         rules["import_"] = toDelegate(&import_);
         rules["media"] = toDelegate(&media);
         rules["important"] = toDelegate(&important);
+        rules["em"] = toDelegate(&em);
+        rules["ex"] = toDelegate(&ex);
+        rules["rem"] = toDelegate(&rem);
         rules["percent"] = toDelegate(&percent);
-        rules["ems"] = toDelegate(&ems);
         rules["length"] = toDelegate(&length);
         rules["angle"] = toDelegate(&angle);
         rules["time"] = toDelegate(&time);
         rules["frequency"] = toDelegate(&frequency);
-        rules["em"] = toDelegate(&em);
-        rules["ex"] = toDelegate(&ex);
-        rules["rem"] = toDelegate(&rem);
-        rules["px"] = toDelegate(&px);
-        rules["cm"] = toDelegate(&cm);
-        rules["mm"] = toDelegate(&mm);
-        rules["in_"] = toDelegate(&in_);
-        rules["pt"] = toDelegate(&pt);
-        rules["pc"] = toDelegate(&pc);
-        rules["deg"] = toDelegate(&deg);
-        rules["rad"] = toDelegate(&rad);
-        rules["grad"] = toDelegate(&grad);
-        rules["ms"] = toDelegate(&ms);
-        rules["sec"] = toDelegate(&sec);
-        rules["hz"] = toDelegate(&hz);
-        rules["khz"] = toDelegate(&khz);
         rules["Spacing"] = toDelegate(&Spacing);
     }
 
@@ -659,7 +645,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(number, percent, length, ems, ex, angle, time, frequency), "CSS.unit")(p);
+            return         pegged.peg.defined!(pegged.peg.or!(percent, length, em, ex, rem, angle, time, frequency, number), "CSS.unit")(p);
         }
         else
         {
@@ -667,7 +653,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(number, percent, length, ems, ex, angle, time, frequency), "CSS.unit"), "unit")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(percent, length, em, ex, rem, angle, time, frequency, number), "CSS.unit"), "unit")(p);
                 memo[tuple(`unit`, p.end)] = result;
                 return result;
             }
@@ -678,12 +664,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(number, percent, length, ems, ex, angle, time, frequency), "CSS.unit")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.or!(percent, length, em, ex, rem, angle, time, frequency, number), "CSS.unit")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(number, percent, length, ems, ex, angle, time, frequency), "CSS.unit"), "unit")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.or!(percent, length, em, ex, rem, angle, time, frequency, number), "CSS.unit"), "unit")(TParseTree("", false,[], s));
         }
     }
     static string unit(GetName g)
@@ -983,7 +969,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(doublequote)), "CSS.string1")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.discard!(doublequote)), "CSS.string1")(p);
         }
         else
         {
@@ -991,7 +977,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(doublequote)), "CSS.string1"), "string1")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.discard!(doublequote)), "CSS.string1"), "string1")(p);
                 memo[tuple(`string1`, p.end)] = result;
                 return result;
             }
@@ -1002,12 +988,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(doublequote)), "CSS.string1")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.discard!(doublequote)), "CSS.string1")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(doublequote)), "CSS.string1"), "string1")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(doublequote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.discard!(doublequote)), "CSS.string1"), "string1")(TParseTree("", false,[], s));
         }
     }
     static string string1(GetName g)
@@ -1019,7 +1005,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(quote)), "CSS.string2")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.discard!(quote)), "CSS.string2")(p);
         }
         else
         {
@@ -1027,7 +1013,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(quote)), "CSS.string2"), "string2")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.discard!(quote)), "CSS.string2"), "string2")(p);
                 memo[tuple(`string2`, p.end)] = result;
                 return result;
             }
@@ -1038,12 +1024,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(quote)), "CSS.string2")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.discard!(quote)), "CSS.string2")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(stringChar), pegged.peg.discard!(quote)), "CSS.string2"), "string2")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(pegged.peg.discard!(quote), pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.discard!(quote)), "CSS.string2"), "string2")(TParseTree("", false,[], s));
         }
     }
     static string string2(GetName g)
@@ -1055,7 +1041,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(string1, string2), "CSS.string_")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(string1, string2)), "CSS.string_")(p);
         }
         else
         {
@@ -1063,7 +1049,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(string1, string2), "CSS.string_"), "string_")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(string1, string2)), "CSS.string_"), "string_")(p);
                 memo[tuple(`string_`, p.end)] = result;
                 return result;
             }
@@ -1074,12 +1060,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(string1, string2), "CSS.string_")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(string1, string2)), "CSS.string_")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(string1, string2), "CSS.string_"), "string_")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(string1, string2)), "CSS.string_"), "string_")(TParseTree("", false,[], s));
         }
     }
     static string string_(GetName g)
@@ -1091,7 +1077,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString1")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString1")(p);
         }
         else
         {
@@ -1099,7 +1085,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString1"), "unclosedString1")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString1"), "unclosedString1")(p);
                 memo[tuple(`unclosedString1`, p.end)] = result;
                 return result;
             }
@@ -1110,12 +1096,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString1")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString1")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString1"), "unclosedString1")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(doublequote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(doublequote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString1"), "unclosedString1")(TParseTree("", false,[], s));
         }
     }
     static string unclosedString1(GetName g)
@@ -1127,7 +1113,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString2")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString2")(p);
         }
         else
         {
@@ -1135,7 +1121,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString2"), "unclosedString2")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString2"), "unclosedString2")(p);
                 memo[tuple(`unclosedString2`, p.end)] = result;
                 return result;
             }
@@ -1146,12 +1132,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString2")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString2")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(stringChar), pegged.peg.option!(backslash)), "CSS.unclosedString2"), "unclosedString2")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(quote, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.negLookahead!(quote), stringChar)), pegged.peg.option!(backslash)), "CSS.unclosedString2"), "unclosedString2")(TParseTree("", false,[], s));
         }
     }
     static string unclosedString2(GetName g)
@@ -1523,7 +1509,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(p);
         }
         else
         {
@@ -1531,7 +1517,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(p);
                 memo[tuple(`number`, p.end)] = result;
                 return result;
             }
@@ -1542,12 +1528,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(TParseTree("", false,[], s));
         }
     }
     static string number(GetName g)
@@ -1915,227 +1901,11 @@ struct GenericCSS(TParseTree)
         return "CSS.important";
     }
 
-    static TParseTree percent(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.literal!("%"), "CSS.percent")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`percent`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.literal!("%"), "CSS.percent"), "percent")(p);
-                memo[tuple(`percent`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree percent(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.literal!("%"), "CSS.percent")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.literal!("%"), "CSS.percent"), "percent")(TParseTree("", false,[], s));
-        }
-    }
-    static string percent(GetName g)
-    {
-        return "CSS.percent";
-    }
-
-    static TParseTree ems(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`ems`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems"), "ems")(p);
-                memo[tuple(`ems`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree ems(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(em, ex, rem), "CSS.ems"), "ems")(TParseTree("", false,[], s));
-        }
-    }
-    static string ems(GetName g)
-    {
-        return "CSS.ems";
-    }
-
-    static TParseTree length(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(px, cm, mm, in_, pt, pc), "CSS.length")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`length`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(px, cm, mm, in_, pt, pc), "CSS.length"), "length")(p);
-                memo[tuple(`length`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree length(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(px, cm, mm, in_, pt, pc), "CSS.length")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(px, cm, mm, in_, pt, pc), "CSS.length"), "length")(TParseTree("", false,[], s));
-        }
-    }
-    static string length(GetName g)
-    {
-        return "CSS.length";
-    }
-
-    static TParseTree angle(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(deg, rad, grad), "CSS.angle")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`angle`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(deg, rad, grad), "CSS.angle"), "angle")(p);
-                memo[tuple(`angle`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree angle(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(deg, rad, grad), "CSS.angle")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(deg, rad, grad), "CSS.angle"), "angle")(TParseTree("", false,[], s));
-        }
-    }
-    static string angle(GetName g)
-    {
-        return "CSS.angle";
-    }
-
-    static TParseTree time(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(ms, sec), "CSS.time")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`time`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(ms, sec), "CSS.time"), "time")(p);
-                memo[tuple(`time`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree time(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(ms, sec), "CSS.time")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(ms, sec), "CSS.time"), "time")(TParseTree("", false,[], s));
-        }
-    }
-    static string time(GetName g)
-    {
-        return "CSS.time";
-    }
-
-    static TParseTree frequency(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(hz, khz), "CSS.frequency")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`frequency`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(hz, khz), "CSS.frequency"), "frequency")(p);
-                memo[tuple(`frequency`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree frequency(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(hz, khz), "CSS.frequency")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(hz, khz), "CSS.frequency"), "frequency")(TParseTree("", false,[], s));
-        }
-    }
-    static string frequency(GetName g)
-    {
-        return "CSS.frequency";
-    }
-
     static TParseTree em(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("em"), "CSS.em")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("em"))), "CSS.em")(p);
         }
         else
         {
@@ -2143,7 +1913,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("em"), "CSS.em"), "em")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("em"))), "CSS.em"), "em")(p);
                 memo[tuple(`em`, p.end)] = result;
                 return result;
             }
@@ -2154,12 +1924,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("em"), "CSS.em")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("em"))), "CSS.em")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("em"), "CSS.em"), "em")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("em"))), "CSS.em"), "em")(TParseTree("", false,[], s));
         }
     }
     static string em(GetName g)
@@ -2171,7 +1941,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ex"), "CSS.ex")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("ex"))), "CSS.ex")(p);
         }
         else
         {
@@ -2179,7 +1949,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ex"), "CSS.ex"), "ex")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("ex"))), "CSS.ex"), "ex")(p);
                 memo[tuple(`ex`, p.end)] = result;
                 return result;
             }
@@ -2190,12 +1960,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ex"), "CSS.ex")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("ex"))), "CSS.ex")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ex"), "CSS.ex"), "ex")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("ex"))), "CSS.ex"), "ex")(TParseTree("", false,[], s));
         }
     }
     static string ex(GetName g)
@@ -2207,7 +1977,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("rem"))), "CSS.rem")(p);
         }
         else
         {
@@ -2215,7 +1985,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("rem"))), "CSS.rem"), "rem")(p);
                 memo[tuple(`rem`, p.end)] = result;
                 return result;
             }
@@ -2226,12 +1996,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("rem"))), "CSS.rem")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rem"), "CSS.rem"), "rem")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.caseInsensitiveLiteral!("rem"))), "CSS.rem"), "rem")(TParseTree("", false,[], s));
         }
     }
     static string rem(GetName g)
@@ -2239,472 +2009,184 @@ struct GenericCSS(TParseTree)
         return "CSS.rem";
     }
 
-    static TParseTree px(TParseTree p)
+    static TParseTree percent(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("px"), "CSS.px")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.literal!("%"))), "CSS.percent")(p);
         }
         else
         {
-            if (auto m = tuple(`px`, p.end) in memo)
+            if (auto m = tuple(`percent`, p.end) in memo)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("px"), "CSS.px"), "px")(p);
-                memo[tuple(`px`, p.end)] = result;
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.literal!("%"))), "CSS.percent"), "percent")(p);
+                memo[tuple(`percent`, p.end)] = result;
                 return result;
             }
         }
     }
 
-    static TParseTree px(string s)
+    static TParseTree percent(string s)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("px"), "CSS.px")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.literal!("%"))), "CSS.percent")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("px"), "CSS.px"), "px")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.literal!("%"))), "CSS.percent"), "percent")(TParseTree("", false,[], s));
         }
     }
-    static string px(GetName g)
+    static string percent(GetName g)
     {
-        return "CSS.px";
+        return "CSS.percent";
     }
 
-    static TParseTree cm(TParseTree p)
+    static TParseTree length(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("cm"), "CSS.cm")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg.caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg.caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length")(p);
         }
         else
         {
-            if (auto m = tuple(`cm`, p.end) in memo)
+            if (auto m = tuple(`length`, p.end) in memo)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("cm"), "CSS.cm"), "cm")(p);
-                memo[tuple(`cm`, p.end)] = result;
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg.caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg.caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length"), "length")(p);
+                memo[tuple(`length`, p.end)] = result;
                 return result;
             }
         }
     }
 
-    static TParseTree cm(string s)
+    static TParseTree length(string s)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("cm"), "CSS.cm")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg.caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg.caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("cm"), "CSS.cm"), "cm")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg.caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg.caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length"), "length")(TParseTree("", false,[], s));
         }
     }
-    static string cm(GetName g)
+    static string length(GetName g)
     {
-        return "CSS.cm";
+        return "CSS.length";
     }
 
-    static TParseTree mm(TParseTree p)
+    static TParseTree angle(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("mm"), "CSS.mm")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("deg"), pegged.peg.caseInsensitiveLiteral!("rad"), pegged.peg.caseInsensitiveLiteral!("grad")))), "CSS.angle")(p);
         }
         else
         {
-            if (auto m = tuple(`mm`, p.end) in memo)
+            if (auto m = tuple(`angle`, p.end) in memo)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("mm"), "CSS.mm"), "mm")(p);
-                memo[tuple(`mm`, p.end)] = result;
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("deg"), pegged.peg.caseInsensitiveLiteral!("rad"), pegged.peg.caseInsensitiveLiteral!("grad")))), "CSS.angle"), "angle")(p);
+                memo[tuple(`angle`, p.end)] = result;
                 return result;
             }
         }
     }
 
-    static TParseTree mm(string s)
+    static TParseTree angle(string s)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("mm"), "CSS.mm")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("deg"), pegged.peg.caseInsensitiveLiteral!("rad"), pegged.peg.caseInsensitiveLiteral!("grad")))), "CSS.angle")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("mm"), "CSS.mm"), "mm")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("deg"), pegged.peg.caseInsensitiveLiteral!("rad"), pegged.peg.caseInsensitiveLiteral!("grad")))), "CSS.angle"), "angle")(TParseTree("", false,[], s));
         }
     }
-    static string mm(GetName g)
+    static string angle(GetName g)
     {
-        return "CSS.mm";
+        return "CSS.angle";
     }
 
-    static TParseTree in_(TParseTree p)
+    static TParseTree time(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("in"), "CSS.in_")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("ms"), pegged.peg.caseInsensitiveLiteral!("s")))), "CSS.time")(p);
         }
         else
         {
-            if (auto m = tuple(`in_`, p.end) in memo)
+            if (auto m = tuple(`time`, p.end) in memo)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("in"), "CSS.in_"), "in_")(p);
-                memo[tuple(`in_`, p.end)] = result;
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("ms"), pegged.peg.caseInsensitiveLiteral!("s")))), "CSS.time"), "time")(p);
+                memo[tuple(`time`, p.end)] = result;
                 return result;
             }
         }
     }
 
-    static TParseTree in_(string s)
+    static TParseTree time(string s)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("in"), "CSS.in_")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("ms"), pegged.peg.caseInsensitiveLiteral!("s")))), "CSS.time")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("in"), "CSS.in_"), "in_")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("ms"), pegged.peg.caseInsensitiveLiteral!("s")))), "CSS.time"), "time")(TParseTree("", false,[], s));
         }
     }
-    static string in_(GetName g)
+    static string time(GetName g)
     {
-        return "CSS.in_";
+        return "CSS.time";
     }
 
-    static TParseTree pt(TParseTree p)
+    static TParseTree frequency(TParseTree p)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pt"), "CSS.pt")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("hz"), pegged.peg.caseInsensitiveLiteral!("khz")))), "CSS.frequency")(p);
         }
         else
         {
-            if (auto m = tuple(`pt`, p.end) in memo)
+            if (auto m = tuple(`frequency`, p.end) in memo)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pt"), "CSS.pt"), "pt")(p);
-                memo[tuple(`pt`, p.end)] = result;
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("hz"), pegged.peg.caseInsensitiveLiteral!("khz")))), "CSS.frequency"), "frequency")(p);
+                memo[tuple(`frequency`, p.end)] = result;
                 return result;
             }
         }
     }
 
-    static TParseTree pt(string s)
+    static TParseTree frequency(string s)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pt"), "CSS.pt")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("hz"), pegged.peg.caseInsensitiveLiteral!("khz")))), "CSS.frequency")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pt"), "CSS.pt"), "pt")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("hz"), pegged.peg.caseInsensitiveLiteral!("khz")))), "CSS.frequency"), "frequency")(TParseTree("", false,[], s));
         }
     }
-    static string pt(GetName g)
+    static string frequency(GetName g)
     {
-        return "CSS.pt";
-    }
-
-    static TParseTree pc(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pc"), "CSS.pc")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`pc`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pc"), "CSS.pc"), "pc")(p);
-                memo[tuple(`pc`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree pc(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pc"), "CSS.pc")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("pc"), "CSS.pc"), "pc")(TParseTree("", false,[], s));
-        }
-    }
-    static string pc(GetName g)
-    {
-        return "CSS.pc";
-    }
-
-    static TParseTree deg(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("deg"), "CSS.deg")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`deg`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("deg"), "CSS.deg"), "deg")(p);
-                memo[tuple(`deg`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree deg(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("deg"), "CSS.deg")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("deg"), "CSS.deg"), "deg")(TParseTree("", false,[], s));
-        }
-    }
-    static string deg(GetName g)
-    {
-        return "CSS.deg";
-    }
-
-    static TParseTree rad(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rad"), "CSS.rad")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`rad`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rad"), "CSS.rad"), "rad")(p);
-                memo[tuple(`rad`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree rad(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rad"), "CSS.rad")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("rad"), "CSS.rad"), "rad")(TParseTree("", false,[], s));
-        }
-    }
-    static string rad(GetName g)
-    {
-        return "CSS.rad";
-    }
-
-    static TParseTree grad(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("grad"), "CSS.grad")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`grad`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("grad"), "CSS.grad"), "grad")(p);
-                memo[tuple(`grad`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree grad(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("grad"), "CSS.grad")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("grad"), "CSS.grad"), "grad")(TParseTree("", false,[], s));
-        }
-    }
-    static string grad(GetName g)
-    {
-        return "CSS.grad";
-    }
-
-    static TParseTree ms(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ms"), "CSS.ms")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`ms`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ms"), "CSS.ms"), "ms")(p);
-                memo[tuple(`ms`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree ms(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ms"), "CSS.ms")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("ms"), "CSS.ms"), "ms")(TParseTree("", false,[], s));
-        }
-    }
-    static string ms(GetName g)
-    {
-        return "CSS.ms";
-    }
-
-    static TParseTree sec(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("s"), "CSS.sec")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`sec`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("s"), "CSS.sec"), "sec")(p);
-                memo[tuple(`sec`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree sec(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("s"), "CSS.sec")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("s"), "CSS.sec"), "sec")(TParseTree("", false,[], s));
-        }
-    }
-    static string sec(GetName g)
-    {
-        return "CSS.sec";
-    }
-
-    static TParseTree hz(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("hz"), "CSS.hz")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`hz`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("hz"), "CSS.hz"), "hz")(p);
-                memo[tuple(`hz`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree hz(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("hz"), "CSS.hz")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.caseInsensitiveLiteral!("hz"), "CSS.hz"), "hz")(TParseTree("", false,[], s));
-        }
-    }
-    static string hz(GetName g)
-    {
-        return "CSS.hz";
-    }
-
-    static TParseTree khz(TParseTree p)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("khz"), pegged.peg.caseInsensitiveLiteral!("kHz")), "CSS.khz")(p);
-        }
-        else
-        {
-            if (auto m = tuple(`khz`, p.end) in memo)
-                return *m;
-            else
-            {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("khz"), pegged.peg.caseInsensitiveLiteral!("kHz")), "CSS.khz"), "khz")(p);
-                memo[tuple(`khz`, p.end)] = result;
-                return result;
-            }
-        }
-    }
-
-    static TParseTree khz(string s)
-    {
-        if(__ctfe)
-        {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("khz"), pegged.peg.caseInsensitiveLiteral!("kHz")), "CSS.khz")(TParseTree("", false,[], s));
-        }
-        else
-        {
-            forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.caseInsensitiveLiteral!("khz"), pegged.peg.caseInsensitiveLiteral!("kHz")), "CSS.khz"), "khz")(TParseTree("", false,[], s));
-        }
-    }
-    static string khz(GetName g)
-    {
-        return "CSS.khz";
+        return "CSS.frequency";
     }
 
     static TParseTree opCall(TParseTree p)

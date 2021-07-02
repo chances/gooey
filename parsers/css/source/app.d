@@ -1,5 +1,10 @@
 import std.stdio;
 
+/// Adapted from the CSS 2.1 Grammar (https://www.w3.org/TR/CSS21/grammar.html)
+///
+/// Authors: Chance Snow
+/// Copyright: Copyright © 2021 Chance Snow. All rights reserved.
+/// License: MIT License
 import pegged.grammar;
 
 void main()
@@ -29,7 +34,7 @@ void main()
 
     expr <- term ( operator? term )*
     term <- unary_operator? unit _* / string_ _* / identifier _* / uri _* / hexcolor / function_
-    unit <- number / percent / length / ems / ex / angle / time / frequency
+    unit <- percent / length / em / ex / rem / angle / time / frequency / number
     function_ <- identifier '(' _* (identifier _*)? ')'
     unary_operator <- '-' / '+'
     operator <- '/' _* / ',' _*
@@ -43,11 +48,11 @@ void main()
     unicodePoint  <- hex hex hex hex hex hex / hex hex hex hex hex / hex hex hex hex / hex hex hex / hex hex / hex
     escape    <- unicode / (backslash ![\r\n0-9a-f] .)
     stringChar <- escape / (![\n\r\"] .)
-    string1   <- :doublequote stringChar* :doublequote
-    string2   <- :quote stringChar* :quote
-    string_   <- string1  / string2
-    unclosedString1   <- doublequote stringChar* backslash?
-    unclosedString2   <- quote stringChar* backslash?
+    string1   <- :doublequote (!doublequote stringChar)* :doublequote
+    string2   <- :quote (!quote stringChar)* :quote
+    string_   <- ~(string1  / string2)
+    unclosedString1   <- doublequote (!doublequote stringChar)* backslash?
+    unclosedString2   <- quote (!quote stringChar)* backslash?
     unclosedString    <- unclosedString1 / unclosedString2
     url           <- ([!#$%&*-~] / escape)*
     uri           <- "url(" w string_ w ")" / "url(" w url w ")"
@@ -63,7 +68,7 @@ void main()
     nameHead    <- [A-Za-z_]
     nameTail    <- [A-Za-z0-9_] / '-' / escape
     identifier  <- ~('-'? nameHead nameTail*)
-    number <-		[0-9]+ / [0-9]* "." [0-9]+
+    number      <- ~([0-9]* "." [0-9]+ / [0-9]+)
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
     w <- _?
@@ -81,32 +86,14 @@ void main()
     #==================================#
     # Units
     #==================================#
-    percent <- '%'
-    ems <- em / ex / rem
-    length <- px / cm / mm / in_ / pt / pc
-    angle <- deg / rad / grad
-    time <- ms / sec
-    frequency <- hz / khz
-    #	Lengths
-    em  <- 'em'i    #	EMs
-    ex  <- 'ex'i    # x-height
-    rem <- 'rem'i   # Relative EMs
-    px  <- 'px'i    #	Pixels
-    cm  <- 'cm'i    #	Centimeters
-    mm  <- 'mm'i    #	Millimeters
-    in_ <- 'in'i    #	Inches
-    pt  <- 'pt'i    #	Points
-    pc  <- 'pc'i    #	?
-    # Angles
-    deg <- 'deg'i       #	Degrees
-    rad <- 'rad'i       #	Radians
-    grad <- 'grad'i     # ?
-    # Time (Duration)
-    ms <- 'ms'i         #	Milliseconds
-    sec <- 's'i         #	Seconds
-    # Frequencies
-    hz <- 'hz'i             #	Hertz
-    khz <- 'khz'i / 'kHz'i  #	Frequency
+    em  <- ~(number 'em'i)    #	EMs
+    ex  <- ~(number 'ex'i)    # x-height
+    rem <- ~(number 'rem'i)   # Relative EMs
+    percent <- ~(number '%')
+    length <- ~(number ('px'i / 'cm'i / 'mm'i / 'in_'i / 'pt'i / 'pc'i))
+    angle <- ~(number ('deg'i / 'rad'i / 'grad'i))
+    time <- ~(number ('ms'i / 's'i))
+    frequency <- ~(number ('hz'i / 'khz'i))
   `);
 
   writeln("Written parser at " ~ destinationPath);
