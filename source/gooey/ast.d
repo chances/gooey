@@ -20,21 +20,10 @@ abstract class Node {
   }
 }
 
-string enforceContentful(string input) {
-  if(input is null || input.length == 0) throw new SyntaxError("Expected non-null, non-empty input!");
-  return input;
-}
-
-/// Simplify a parsed AST.
-ParseTree decimate(T)(ParseTree node) {
-  auto simplifiedAst = T.decimateTree(node);
-  debug {
-    import std.array : join;
-    import std.stdio : writeln;
-
-    writeln(node.successful ? simplifiedAst.toString() : [node.name, node.failMsg()].join(": "));
-  }
-  return simplifiedAst;
+///
+interface Parsable(T) {
+  ///
+  static T parse(string input);
 }
 
 /// Thrown when a parser encounters a syntax error.
@@ -52,6 +41,35 @@ class SyntaxError : Exception {
   }
 }
 
+string enforceContentful(string input) {
+  if(input is null || input.length == 0) throw new SyntaxError("Expected non-null, non-empty input!");
+  return input;
+}
+
+/// Simplify a parsed AST.
+ParseTree decimate(T)(ParseTree node) {
+  auto simplifiedAst = T.decimateTree(node);
+  debug {
+    import std.array : join;
+    import std.stdio : writeln;
+
+    writeln(node.successful ? simplifiedAst.toString() : [node.name, node.failMsg()].join(": "));
+  }
+  return simplifiedAst;
+}
+
+string match(inout ParseTree node, string delimiter = null) {
+  import std.array : join;
+  return delimiter is null ? node.matches.join() : node.matches.join(delimiter);
+}
+
+/// Retreive the first observed leaf in a depth-first traversal of the given `node`.
+ParseTree firstLeaf(ParseTree node) {
+  if (node.children.length == 0) return node;
+  return firstLeaf(node.children[0]);
+}
+
+///
 bool isNamed(const ParseTree node, string function(GetName _) rule) {
   import std.algorithm : cmp;
   return node.name.cmp(rule(GetName())) == 0;
@@ -74,7 +92,7 @@ const(ParseTree) enforceChildNamed(const ParseTree node, string function(GetName
   }
   throw new SyntaxError(node, format!"Expected `%s`, but got `%s`"(
     ruleName.splitter(".").joiner(" ").array,
-    node.children.length > 0 ? node.matches.join() : "end of file"
+    node.children.length > 0 ? node.match() : "end of file"
   ));
 }
 

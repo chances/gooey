@@ -3,8 +3,11 @@
 /// License: MIT License
 module gooey.css.values;
 
+import pegged.peg : Position;
 import std.conv : to;
 import std.typecons : Flag, No;
+
+import gooey.ast;
 
 /// An abstract CSS value.
 /// See_Also: $(UL
@@ -12,7 +15,45 @@ import std.typecons : Flag, No;
 ///   $(LI `Length`)
 ///   $(LI `Color`)
 /// )
-abstract class Value {
+abstract class Value : Node {
+  this(const Position* sourcePosition = null) {
+    super(sourcePosition);
+  }
+
+  static const(Value) parse(string input) {
+    import gooey.css.parser : CSS, GetName;
+    import std.algorithm : any, endsWith, equal, map, stripLeft, stripRight;
+    import std.array : array, join;
+    import std.ascii : isDigit;
+    import std.conv : parse;
+    import std.string : format;
+    import std.traits : EnumMembers;
+
+    auto term = CSS.term(input.enforceContentful()).decimate!CSS();
+    if (!term.successful) throw new SyntaxError(term);
+    assert(term.isNamed(&CSS.term) && term.children.length > 0);
+
+    if (term.firstLeaf.isNamed(&CSS.string_)) return new String(term.match());
+    if (term.firstLeaf.isNamed(&CSS.identifier)) {
+      auto keyword = term.match();
+      if (colors.keys.any!(color => color.equal(keyword))()) return colors[keyword];
+      return new Keyword(keyword);
+    }
+
+    auto number = term.match();
+    if (term.firstLeaf.isNamed(&CSS.number)) return new Length(parse!double(number));
+
+    assert([EnumMembers!Unit].map!(unit => unit.notation()).any!(unit => number.endsWith(unit))());
+    auto value = number.stripRight!(c => !c.isDigit && c != '.')();
+    assert(value.length != number.length);
+    return new Length(
+      parse!double(value),
+      parseUnit(number.stripLeft!(c => c.isDigit || c == '.')())
+    );
+
+    assert(0, "Unimplemented");
+  }
+
   float pixels() @property const {
     if (typeid(Length).isBaseOf(this.classinfo) && this.to!(const Length).unit == Unit.pixels)
       return this.to!(const Length).value;
@@ -21,7 +62,7 @@ abstract class Value {
   }
 
   /// Convert this value to its CSS representation.
-  abstract string toCSS() const;
+  abstract string toCSS() @property const;
 }
 
 unittest {
@@ -61,6 +102,7 @@ enum Unit {
   radians,
 }
 
+///
 string getName(Unit unit) @property {
   switch (unit) {
     case Unit.unitless:
@@ -69,6 +111,8 @@ string getName(Unit unit) @property {
       return "Percentage";
     case Unit.em:
       return "Ems";
+    case Unit.ex:
+      return "x-Height";
     case Unit.rem:
       return "Relative Ems";
     case Unit.inches:
@@ -92,6 +136,7 @@ string getName(Unit unit) @property {
   }
 }
 
+///
 string notation(Unit unit) @property {
   switch (unit) {
     case Unit.unitless:
@@ -100,6 +145,8 @@ string notation(Unit unit) @property {
       return "%";
     case Unit.em:
       return "em";
+    case Unit.ex:
+      return "ex";
     case Unit.rem:
       return "rem";
     case Unit.inches:
@@ -123,9 +170,35 @@ string notation(Unit unit) @property {
   }
 }
 
+/// Parse a CSS unit given its `notation`.
+Unit parseUnit(string notation) {
+  import std.algorithm : equal;
+
+  foreach (unit; Unit.min..Unit.max) {
+    if (unit.notation().equal(notation)) return unit;
+  }
+  return Unit.unitless;
+}
+
+unittest {
+  import std.algorithm : equal;
+
+  assert(parseUnit("") == Unit.unitless);
+  assert(parseUnit("foo") == Unit.unitless);
+  assert(parseUnit("ex").getName().equal("x-Height"));
+  assert(parseUnit("in") == Unit.inches);
+  assert(parseUnit("in").getName().equal("Inches"));
+  assert(parseUnit("cm") == Unit.centimeters);
+  assert(parseUnit("cm").getName().equal("Centimeters"));
+  assert(parseUnit("mm") == Unit.millimeters);
+  assert(parseUnit("mm").getName().equal("Millimeters"));
+  assert(parseUnit("pc") == Unit.picas);
+  assert(parseUnit("pc").getName().equal("Picas"));
+}
+
 /// A distnace measurement.
 /// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
-class Length : Value {
+class Length : Value, Parsable!Length {
   /// Unit of measurement of this length's `value`.
   /// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
   const Unit unit;
@@ -133,7 +206,8 @@ class Length : Value {
   const double value;
 
   ///
-  this(double value, Unit unit = Unit.unitless) {
+  this(double value, Unit unit = Unit.unitless, const Position* sourcePosition = null) {
+    super(sourcePosition);
     this.value = value;
     this.unit = unit;
   }
@@ -143,8 +217,13 @@ class Length : Value {
     return new Length(0, unit);
   }
 
+  /// See_Also: `Value.parse`
+  static const(Length) parse(string input) {
+    return Value.parse(input).to!(const Length);
+  }
+
   ///
-  override string toCSS() const {
+  override string toCSS() @property const {
     import std.conv : text;
     import std.string : format, stripRight;
     return text(value) ~ unit.notation();
@@ -178,6 +257,17 @@ unittest {
   assert(new Length(12, Unit.degrees).toString().equal("12 Degrees (deg)"));
   import std.math : PI;
   assert(new Length(PI, Unit.radians).toString().equal("3.14159 Radians (rad)"));
+
+  auto number = Length.parse("45.5");
+  assert(typeid(number).isBaseOf(number.classinfo));
+  assert(number.value == 45.5);
+  assert(number.unit == Unit.unitless);
+
+  const length = Length.parse("12px");
+  assert(typeid(Length).isBaseOf(length.classinfo));
+  assert(length.value == 12);
+  assert(length.unit == Unit.pixels);
+  assert(length.toCSS().equal("12px"));
 }
 
 /// A string of text.
@@ -187,12 +277,21 @@ class String : Value {
   const string value;
 
   ///
-  this(string value) {
+  this(string value, const Position* sourcePosition = null) {
+    super(sourcePosition);
     this.value = value;
   }
 
+  /// See_Also: `Value.parse`
+  static const(String) parse(string input) {
+    return Value.parse(input).to!(const String);
+  }
+
   ///
-  string toCSS(Flag!"singleQuotes" singleQuotes = No.singleQuotes) const {
+  override string toCSS() @property const {
+    return toCSS(No.singleQuotes);
+  }
+  string toCSS(Flag!"singleQuotes" singleQuotes) @property const {
     import std.string : replace;
 
     const quote = singleQuotes ? "'" : "\"";
@@ -205,6 +304,14 @@ class String : Value {
   }
 }
 
+unittest {
+  import std.algorithm : equal;
+
+  auto foobar = String.parse("'foobar'");
+  assert(foobar.value.equal("foobar"));
+  assert(foobar.toCSS.equal("\"foobar\""));
+}
+
 /// A reserved intentifier.
 /// See_Also: https://drafts.csswg.org/css2/#keywords
 class Keyword : Value {
@@ -212,15 +319,21 @@ class Keyword : Value {
   const string value;
 
   ///
-  this(string value) {
+  this(string value, const Position* sourcePosition = null) {
+    super(sourcePosition);
     this.value = value;
   }
 
   ///
   static const auto_ = new Keyword("auto");
 
+  /// See_Also: `Value.parse`
+  static const(Keyword) parse(string input) {
+    return Value.parse(input).to!(const Keyword);
+  }
+
   ///
-  override string toCSS() const {
+  override string toCSS() @property const {
     return typeid(Color).isBaseOf(this.classinfo) ? this.to!(const Color).toCSS() : value;
   }
 
@@ -242,6 +355,8 @@ class Keyword : Value {
 }
 
 unittest {
+  import std.algorithm : equal;
+
   assert(Keyword.auto_ == new Keyword("auto"));
   assert(Keyword.auto_ == Keyword.auto_);
   assert(Keyword.auto_ !is null);
@@ -249,6 +364,8 @@ unittest {
 
   auto keyword = new Keyword("orange");
   assert(Keyword.auto_ != keyword);
+
+  assert(Keyword.parse("inset").value.equal("inset"));
 }
 
 /// Either a keyword or a numerical RGB(A) value.
@@ -299,27 +416,55 @@ class Color : Keyword {
   static const yellow = new Color("yellow", 0xFF, 0xFF, 0);
 
   /// Instantiate a reserved color `Keyword`.
-  this(string keyword, int r, int g, int b, int a = 0) {
-    this(keyword, cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a);
+  this(string keyword, int r, int g, int b, int a = 0, const Position* sourcePosition = null) {
+    this(keyword, cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   /// Instantiate a reserved color `Keyword`.
-  this(string keyword, byte r, byte g, byte b, byte a = 0) {
-    super(keyword);
+  this(string keyword, byte r, byte g, byte b, byte a = 0, const Position* sourcePosition = null) {
+    super(keyword, sourcePosition);
     this.r = r;
     this.g = g;
     this.b = b;
     this.a = a;
   }
   ///
-  this(int r, int g, int b, int a = 0) {
-    this(cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a);
+  this(int r, int g, int b, int a = 0, const Position* sourcePosition = null) {
+    this(cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   ///
-  this(byte r, byte g, byte b, byte a = 0) {
-    super(null);
+  this(byte r, byte g, byte b, byte a = 0, const Position* sourcePosition = null) {
+    super(null, sourcePosition);
     this.r = r;
     this.g = g;
     this.b = b;
     this.a = a;
   }
+
+  /// See_Also: `Value.parse`
+  static const(Color) parse(string input) {
+    return Value.parse(input).to!(const Color);
+  }
+}
+
+///
+auto colors() {
+  return [
+    __traits(identifier, Color.aqua): Color.aqua,
+    __traits(identifier, Color.black): Color.black,
+    __traits(identifier, Color.blue): Color.blue,
+    __traits(identifier, Color.fuchsia): Color.fuchsia,
+    __traits(identifier, Color.gray): Color.gray,
+    __traits(identifier, Color.green): Color.green,
+    __traits(identifier, Color.lime): Color.lime,
+    __traits(identifier, Color.maroon): Color.maroon,
+    __traits(identifier, Color.navy): Color.navy,
+    __traits(identifier, Color.olive): Color.olive,
+    __traits(identifier, Color.orange): Color.orange,
+    __traits(identifier, Color.purple): Color.purple,
+    __traits(identifier, Color.red): Color.red,
+    __traits(identifier, Color.silver): Color.silver,
+    __traits(identifier, Color.teal): Color.teal,
+    __traits(identifier, Color.white): Color.white,
+    __traits(identifier, Color.yellow): Color.yellow
+  ];
 }

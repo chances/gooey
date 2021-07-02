@@ -39,7 +39,7 @@ struct Specificity {
 
 /// An abstract CSS selector.
 /// See_Also: `SimpleSelector`
-abstract class Selector : Node {
+abstract class Selector : Node, Parsable!Selector {
   /// Specificity weight of this selector.
   const Specificity specificity;
 
@@ -53,7 +53,6 @@ abstract class Selector : Node {
   static Selector parse(string input) {
     import gooey.css.parser : CSS, GetName;
     import std.array : join;
-    import std.functional : toDelegate;
 
     const ast = CSS.selector(input.enforceContentful()).decimate!CSS();
     if (!ast.successful) throw new SyntaxError(ast);
@@ -65,7 +64,7 @@ abstract class Selector : Node {
     string[] classes;
     foreach (node; selector.children) {
       if (node.isNamed(&CSS.hash)) id = node.matches[1..$].join();
-      else if (node.isNamed(&CSS.elementName)) elementName = node.matches.join();
+      else if (node.isNamed(&CSS.elementName)) elementName = node.match();
       else if (node.isNamed(&CSS.class_)) classes ~= node.matches[1..$].join();
     }
 
