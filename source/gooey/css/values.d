@@ -372,13 +372,13 @@ unittest {
 /// See_Also: https://drafts.csswg.org/css2/#color-units
 class Color : Keyword {
   /// Red component of this color.
-  const byte r;
+  const ubyte r;
   /// Green component of this color.
-  const byte g;
+  const ubyte g;
   /// Blue component of this color.
-  const byte b;
+  const ubyte b;
   /// Alpha component of this color. `0` is fully transparent. `255`/`0xFF` is fully opaque;
-  const byte a;
+  const ubyte a;
 
   /// See_Also: https://drafts.csswg.org/css2/#valdef-color-aqua
   static const aqua = new Color("aqua", 0, 0xFF, 0xFF);
@@ -444,6 +444,15 @@ class Color : Keyword {
   static const(Color) parse(string input) {
     return Value.parse(input).to!(const Color);
   }
+
+  override string toCSS() @property const {
+    import std.string : format;
+    if (a > 0) {
+      import std.math : round;
+      return format!"rgba(%d,%d,%d,%d%%)"(r, g, b, round(a.to!int / 255 * 100).to!int);
+    }
+    return "#" ~ format!"%X"((r << 16) + (g << 8) + b);
+  }
 }
 
 ///
@@ -467,4 +476,11 @@ auto colors() {
     __traits(identifier, Color.white): Color.white,
     __traits(identifier, Color.yellow): Color.yellow
   ];
+}
+
+unittest {
+  import std.algorithm : equal;
+
+  assert(colors["red"].toCSS.equal("#FF0000"));
+  assert(Color.parse("red").toCSS.equal("#FF0000"));
 }
