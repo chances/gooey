@@ -1689,7 +1689,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex)), "CSS.hexcolor")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex))), "CSS.hexcolor")(p);
         }
         else
         {
@@ -1697,7 +1697,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex)), "CSS.hexcolor"), "hexcolor")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex))), "CSS.hexcolor"), "hexcolor")(p);
                 memo[tuple(`hexcolor`, p.end)] = result;
                 return result;
             }
@@ -1708,12 +1708,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex)), "CSS.hexcolor")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex))), "CSS.hexcolor")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex)), "CSS.hexcolor"), "hexcolor")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex, hex, hex, hex), pegged.peg.and!(pegged.peg.literal!("#"), hex, hex, hex))), "CSS.hexcolor"), "hexcolor")(TParseTree("", false,[], s));
         }
     }
     static string hexcolor(GetName g)

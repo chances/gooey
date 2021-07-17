@@ -74,7 +74,7 @@ void main()
     w <- _?
 
     hash <- '#' ~(nameTail+)
-    hexcolor <- '#' hex hex hex hex hex hex / '#' hex hex hex
+    hexcolor <- ~('#' hex hex hex hex hex hex / '#' hex hex hex)
     includes <- "~="
     dashMatch <- "|="
 

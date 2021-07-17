@@ -39,6 +39,14 @@ abstract class Value : Node {
       if (colors.keys.any!(color => color.equal(keyword))()) return colors[keyword];
       return new Keyword(keyword);
     }
+    if (term.firstLeaf.isNamed(&CSS.hexcolor)) {
+      auto hexColor = term.match().stripLeft!(c => c == '#');
+      auto color = hexColor.length == 3
+        ? [hexColor[0], hexColor[0], hexColor[1], hexColor[1], hexColor[2], hexColor[2]]
+        : hexColor;
+      assert(color.length == 6, "Color is not a six digit haxadecimal value: " ~ color);
+      return Color.parse(color.to!uint(16));
+    }
 
     auto number = term.match();
     if (term.firstLeaf.isNamed(&CSS.number)) return new Length(parse!double(number));
@@ -420,7 +428,7 @@ class Color : Keyword {
     this(keyword, cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   /// Instantiate a reserved color `Keyword`.
-  this(string keyword, byte r, byte g, byte b, byte a = 0, const Position* sourcePosition = null) {
+  this(string keyword, ubyte r, ubyte g, ubyte b, ubyte a = 0, const Position* sourcePosition = null) {
     super(keyword, sourcePosition);
     this.r = r;
     this.g = g;
@@ -432,7 +440,7 @@ class Color : Keyword {
     this(cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   ///
-  this(byte r, byte g, byte b, byte a = 0, const Position* sourcePosition = null) {
+  this(ubyte r, ubyte g, ubyte b, ubyte a = 0, const Position* sourcePosition = null) {
     super(null, sourcePosition);
     this.r = r;
     this.g = g;
@@ -445,13 +453,24 @@ class Color : Keyword {
     return Value.parse(input).to!(const Color);
   }
 
+  ///
+  static const(Color) parse(uint color, const Position* sourcePosition = null) {
+    ubyte r = (color & 0xFF0000) >> 16;
+    ubyte g = (color & 0x00FF00) >> 8;
+    ubyte b = color & 0x0000FF;
+    return new Color(r, g, b, 0, sourcePosition);
+  }
+
   override string toCSS() @property const {
+    import std.array : array;
+    import std.range : padLeft;
     import std.string : format;
+
     if (a > 0) {
       import std.math : round;
       return format!"rgba(%d,%d,%d,%d%%)"(r, g, b, round(a.to!int / 255 * 100).to!int);
     }
-    return "#" ~ format!"%X"((r << 16) + (g << 8) + b);
+    return "#" ~ format!"%X"((r << 16) + (g << 8) + b).padLeft('0', 6).array.to!string;
   }
 }
 
@@ -483,4 +502,6 @@ unittest {
 
   assert(colors["red"].toCSS.equal("#FF0000"));
   assert(Color.parse("red").toCSS.equal("#FF0000"));
+  assert(Color.parse("#f00").toCSS.equal("#FF0000"));
+  assert(Color.parse("#0a0").toCSS.equal("#00AA00"));
 }
