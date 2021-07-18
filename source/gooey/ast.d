@@ -63,10 +63,32 @@ string match(inout ParseTree node, string delimiter = null) {
   return delimiter is null ? node.matches.join() : node.matches.join(delimiter);
 }
 
+/// Retreive the first child of the given `node`.
+ParseTree firstChild(ParseTree node) {
+  import std.range : front;
+  assert(node.children.length > 0);
+  return node.children.front;
+}
+
 /// Retreive the first observed leaf in a depth-first traversal of the given `node`.
 ParseTree firstLeaf(ParseTree node) {
   if (node.children.length == 0) return node;
   return firstLeaf(node.children[0]);
+}
+
+/// Retreive the last child of the given `node`.
+ParseTree lastChild(ParseTree node) {
+  import std.range : tail;
+
+  assert(node.children.length > 0);
+  return node.children.tail(1)[0];
+}
+
+/// Retreive the last observed leaf in a depth-first traversal of the given `node`.
+ParseTree lastLeaf(ParseTree node) {
+  import std.range : tail;
+  if (node.children.length == 0) return node;
+  return lastLeaf(node.children.tail(1)[0]);
 }
 
 ///

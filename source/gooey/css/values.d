@@ -16,23 +16,43 @@ import gooey.ast;
 ///   $(LI `Color`)
 /// )
 abstract class Value : Node {
+  ///
   this(const Position* sourcePosition = null) {
     super(sourcePosition);
   }
 
+  ///
   static const(Value) parse(string input) {
-    import gooey.css.parser : CSS, GetName;
-    import std.algorithm : any, endsWith, equal, map, stripLeft, stripRight;
+    import gooey.css.functions : Function;
+    import gooey.css.parser : CSS;
+    import std.algorithm : all, any, endsWith, equal, map, stripLeft, stripRight;
     import std.array : array, join;
     import std.ascii : isDigit;
     import std.conv : parse;
     import std.string : format;
     import std.traits : EnumMembers;
+    import std.typecons : Yes;
 
     auto term = CSS.term(input.enforceContentful()).decimate!CSS();
     if (!term.successful) throw new SyntaxError(term);
     assert(term.isNamed(&CSS.term) && term.children.length > 0);
 
+    if (term.firstChild.isNamed(&CSS.function_)) {
+      const func = Function.parse(term.firstChild);
+      if (func.name == "rgb" && func.parameters.length >= 3 && func.parametersAreOf!Length)
+        return new Color(
+          func.parameters[0].toColorComponent,
+          func.parameters[1].toColorComponent,
+          func.parameters[2].toColorComponent,
+        );
+      if (func.name == "rgba" && func.parameters.length >= 3 && func.parametersAreOf!Length)
+        return new Color(
+          func.parameters[0].toColorComponent,
+          func.parameters[1].toColorComponent,
+          func.parameters[2].toColorComponent,
+          func.parameters.length > 3 ? func.parameters[3].toColorComponent(Yes.isAlphaComponent) : 255,
+        );
+    }
     if (term.firstLeaf.isNamed(&CSS.string_)) return new String(term.match());
     if (term.firstLeaf.isNamed(&CSS.identifier)) {
       auto keyword = term.match();
@@ -44,7 +64,7 @@ abstract class Value : Node {
       auto color = hexColor.length == 3
         ? [hexColor[0], hexColor[0], hexColor[1], hexColor[1], hexColor[2], hexColor[2]]
         : hexColor;
-      assert(color.length == 6, "Color is not a six digit haxadecimal value: " ~ color);
+      assert(color.length == 6, "Color is not a six digit hexadecimal value: " ~ color);
       return Color.parse(color.to!uint(16));
     }
 
@@ -251,6 +271,22 @@ class Length : Value, Parsable!Length {
   }
 }
 
+/// Convert the given CSS `Value` to a CSS `Color` component.
+///
+/// The integer value 255 corresponds to 100%, and to F or FF in the hexadecimal notation.
+package uint toColorComponent(const Value value, Flag!"isAlphaComponent" isAlphaComponent = No.isAlphaComponent) {
+  import std.algorithm : clamp;
+  import std.math : round;
+
+
+  assert(typeid(Length).isBaseOf(value.classinfo), "Given value is not a CSS length: " ~ value.toCSS());
+  const length = value.to!(const Length);
+  if (length.unit == Unit.percentage)
+    return round(255 * (length.value / 100.0)).to!uint;
+  assert(length.unit == Unit.unitless);
+  return isAlphaComponent ? round(255 * length.value.clamp(0, 1)).to!uint : length.value.to!uint;
+}
+
 unittest {
   import std.algorithm : equal;
 
@@ -424,11 +460,11 @@ class Color : Keyword {
   static const yellow = new Color("yellow", 0xFF, 0xFF, 0);
 
   /// Instantiate a reserved color `Keyword`.
-  this(string keyword, int r, int g, int b, int a = 0, const Position* sourcePosition = null) {
+  this(string keyword, int r, int g, int b, int a = 255, const Position* sourcePosition = null) {
     this(keyword, cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   /// Instantiate a reserved color `Keyword`.
-  this(string keyword, ubyte r, ubyte g, ubyte b, ubyte a = 0, const Position* sourcePosition = null) {
+  this(string keyword, ubyte r, ubyte g, ubyte b, ubyte a = 255, const Position* sourcePosition = null) {
     super(keyword, sourcePosition);
     this.r = r;
     this.g = g;
@@ -436,11 +472,11 @@ class Color : Keyword {
     this.a = a;
   }
   ///
-  this(int r, int g, int b, int a = 0, const Position* sourcePosition = null) {
+  this(int r, int g, int b, int a = 255, const Position* sourcePosition = null) {
     this(cast(byte) r, cast(byte) g, cast(byte) b, cast(byte) a, sourcePosition);
   }
   ///
-  this(ubyte r, ubyte g, ubyte b, ubyte a = 0, const Position* sourcePosition = null) {
+  this(ubyte r, ubyte g, ubyte b, ubyte a = 255, const Position* sourcePosition = null) {
     super(null, sourcePosition);
     this.r = r;
     this.g = g;
@@ -455,10 +491,10 @@ class Color : Keyword {
 
   ///
   static const(Color) parse(uint color, const Position* sourcePosition = null) {
-    ubyte r = (color & 0xFF0000) >> 16;
-    ubyte g = (color & 0x00FF00) >> 8;
-    ubyte b = color & 0x0000FF;
-    return new Color(r, g, b, 0, sourcePosition);
+    const ubyte red = (color & 0xFF0000) >> 16;
+    const ubyte green = (color & 0x00FF00) >> 8;
+    const ubyte blue = color & 0x0000FF;
+    return new Color(red, green, blue, 255, sourcePosition);
   }
 
   override string toCSS() @property const {
@@ -466,9 +502,9 @@ class Color : Keyword {
     import std.range : padLeft;
     import std.string : format;
 
-    if (a > 0) {
+    if (a < 255) {
       import std.math : round;
-      return format!"rgba(%d,%d,%d,%d%%)"(r, g, b, round(a.to!int / 255 * 100).to!int);
+      return format!"rgba(%d,%d,%d,%d%%)"(r, g, b, round(a / 255.0 * 100).to!int);
     }
     return "#" ~ format!"%X"((r << 16) + (g << 8) + b).padLeft('0', 6).array.to!string;
   }
@@ -504,4 +540,10 @@ unittest {
   assert(Color.parse("red").toCSS.equal("#FF0000"));
   assert(Color.parse("#f00").toCSS.equal("#FF0000"));
   assert(Color.parse("#0a0").toCSS.equal("#00AA00"));
+  assert(Color.parse("rgb(255,0,0)").toCSS.equal("#FF0000"));
+  assert(Color.parse("rgb(100%,0,0)").toCSS.equal("#FF0000"));
+  assert(Color.parse("rgba(255,0,0)").toCSS.equal("#FF0000"));
+  assert(Color.parse("rgba(100%,0,0)").toCSS.equal("#FF0000"));
+  assert(Color.parse("rgba(255,0,0, .5)").toCSS.equal("rgba(255,0,0,50%)"));
+  assert(Color.parse("rgba(255, 0, 0, 75%)").toCSS.equal("rgba(255,0,0,75%)"));
 }

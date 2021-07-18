@@ -573,7 +573,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), term))), "CSS.expr")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), pegged.peg.zeroOrMore!(_), term))), "CSS.expr")(p);
         }
         else
         {
@@ -581,7 +581,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), term))), "CSS.expr"), "expr")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), pegged.peg.zeroOrMore!(_), term))), "CSS.expr"), "expr")(p);
                 memo[tuple(`expr`, p.end)] = result;
                 return result;
             }
@@ -592,12 +592,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), term))), "CSS.expr")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), pegged.peg.zeroOrMore!(_), term))), "CSS.expr")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), term))), "CSS.expr"), "expr")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(term, pegged.peg.zeroOrMore!(pegged.peg.and!(pegged.peg.option!(operator), pegged.peg.zeroOrMore!(_), term))), "CSS.expr"), "expr")(TParseTree("", false,[], s));
         }
     }
     static string expr(GetName g)
@@ -609,7 +609,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), hexcolor, function_), "CSS.term")(p);
+            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), function_, pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), hexcolor), "CSS.term")(p);
         }
         else
         {
@@ -617,7 +617,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), hexcolor, function_), "CSS.term"), "term")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), function_, pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), hexcolor), "CSS.term"), "term")(p);
                 memo[tuple(`term`, p.end)] = result;
                 return result;
             }
@@ -628,12 +628,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), hexcolor, function_), "CSS.term")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), function_, pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), hexcolor), "CSS.term")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), hexcolor, function_), "CSS.term"), "term")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.or!(pegged.peg.and!(pegged.peg.option!(unary_operator), unit, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(string_, pegged.peg.zeroOrMore!(_)), pegged.peg.and!(uri, pegged.peg.zeroOrMore!(_)), function_, pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_)), hexcolor), "CSS.term"), "term")(TParseTree("", false,[], s));
         }
     }
     static string term(GetName g)
@@ -681,7 +681,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_")(p);
+            return         pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(expr, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_")(p);
         }
         else
         {
@@ -689,7 +689,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_"), "function_")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(expr, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_"), "function_")(p);
                 memo[tuple(`function_`, p.end)] = result;
                 return result;
             }
@@ -700,12 +700,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(expr, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(identifier, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_"), "function_")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.and!(identifier, pegged.peg.literal!("("), pegged.peg.zeroOrMore!(_), pegged.peg.option!(pegged.peg.and!(expr, pegged.peg.zeroOrMore!(_))), pegged.peg.literal!(")")), "CSS.function_"), "function_")(TParseTree("", false,[], s));
         }
     }
     static string function_(GetName g)
@@ -1509,7 +1509,7 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(p);
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.and!(pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(p);
         }
         else
         {
@@ -1517,7 +1517,7 @@ struct GenericCSS(TParseTree)
                 return *m;
             else
             {
-                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(p);
+                TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.and!(pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(p);
                 memo[tuple(`number`, p.end)] = result;
                 return result;
             }
@@ -1528,12 +1528,12 @@ struct GenericCSS(TParseTree)
     {
         if(__ctfe)
         {
-            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(TParseTree("", false,[], s));
+            return         pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.and!(pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number")(TParseTree("", false,[], s));
         }
         else
         {
             forgetMemo();
-            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(TParseTree("", false,[], s));
+            return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.or!(pegged.peg.and!(pegged.peg.zeroOrMore!(pegged.peg.charRange!('0', '9')), pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.and!(pegged.peg.literal!("."), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9'))), pegged.peg.oneOrMore!(pegged.peg.charRange!('0', '9')))), "CSS.number"), "number")(TParseTree("", false,[], s));
         }
     }
     static string number(GetName g)

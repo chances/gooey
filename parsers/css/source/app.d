@@ -32,10 +32,10 @@ void main()
     declaration   <- property ':' _* expr (important _*)?
     property <- identifier _*
 
-    expr <- term ( operator? term )*
-    term <- unary_operator? unit _* / string_ _* / identifier _* / uri _* / hexcolor / function_
+    expr <- term ( operator? _* term )*
+    term <- unary_operator? unit _* / string_ _* / uri _* / function_ / identifier _* / hexcolor
     unit <- percent / length / em / ex / rem / angle / time / frequency / number
-    function_ <- identifier '(' _* (identifier _*)? ')'
+    function_ <- identifier '(' _* (expr _*)? ')'
     unary_operator <- '-' / '+'
     operator <- '/' _* / ',' _*
 
@@ -68,7 +68,7 @@ void main()
     nameHead    <- [A-Za-z_]
     nameTail    <- [A-Za-z0-9_] / '-' / escape
     identifier  <- ~('-'? nameHead nameTail*)
-    number      <- ~([0-9]* "." [0-9]+ / [0-9]+)
+    number      <- ~([0-9]* "." [0-9]+ / "." [0-9]+ / [0-9]+)
     newline <- '\n' / '\r\n' / '\r'
     _ <- [ \t\r\n]+
     w <- _?
