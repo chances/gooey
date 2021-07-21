@@ -278,7 +278,6 @@ package uint toColorComponent(const Value value, Flag!"isAlphaComponent" isAlpha
   import std.algorithm : clamp;
   import std.math : round;
 
-
   assert(typeid(Length).isBaseOf(value.classinfo), "Given value is not a CSS length: " ~ value.toCSS());
   const length = value.to!(const Length);
   if (length.unit == Unit.percentage)

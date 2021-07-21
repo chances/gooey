@@ -4,7 +4,6 @@
 module gooey.css.selectors;
 
 import pegged.peg : ParseTree, Position, position;
-import std.algorithm : cmp;
 import std.conv : to;
 
 import gooey.ast;
@@ -52,12 +51,13 @@ abstract class Selector : Node, Parsable!Selector {
   /// Parse a selector given a string `input`.
   static Selector parse(string input) {
     import gooey.css.parser : CSS, GetName;
+    import std.algorithm : equal;
     import std.array : join;
 
     const ast = CSS.selector(input.enforceContentful()).decimate!CSS();
     if (!ast.successful) throw new SyntaxError(ast);
 
-    assert(ast.name.cmp(CSS.selector(GetName())) == 0);
+    assert(ast.isNamed(&CSS.selector));
     const selector = ast.enforceChildNamed(&CSS.simpleSelector);
     string id = null;
     string elementName = null;
@@ -100,14 +100,14 @@ unittest {
 
   auto div = assertNotThrown!SyntaxError(Selector.parse("div"));
   assert(typeid(SimpleSelector).isBaseOf(div.classinfo));
-  assert(div.to!SimpleSelector.elementName.cmp("div") == 0);
+  assert(div.to!SimpleSelector.elementName.equal("div"));
 
   div = assertNotThrown!SyntaxError(Selector.parse("div.hidden"));
-  assert(div.to!SimpleSelector.elementName.cmp("div") == 0);
+  assert(div.to!SimpleSelector.elementName.equal("div"));
   assert(div.to!SimpleSelector.classes.equal(["hidden"]));
 
   auto widget = assertNotThrown!SyntaxError(Selector.parse("#myWidget.hidden"));
-  assert(widget.to!SimpleSelector.id.cmp("myWidget") == 0);
+  assert(widget.to!SimpleSelector.id.equal("myWidget"));
   assert(widget.to!SimpleSelector.classes.equal(["hidden"]));
 }
 
@@ -170,11 +170,11 @@ class SimpleSelector : Selector {
 }
 
 unittest {
-  import std.algorithm : cmp;
+  import std.algorithm : equal;
 
   assert(SimpleSelector.fromTag("*").isUniversalSelector);
 
-  assert(SimpleSelector.fromId("usernameField").id.cmp("usernameField") == 0);
+  assert(SimpleSelector.fromId("usernameField").id.equal("usernameField"));
 
   const anchorSelector = SimpleSelector.fromTag("a");
   assert(hashOf(anchorSelector.elementName) == hashOf("a"));
