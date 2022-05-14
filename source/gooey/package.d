@@ -19,7 +19,7 @@ public class Surface {
     return _format;
   }
 
-  /// Size of this Surface, in pixels.
+  /// Size of this Surface, in logical pixels.
   Size dimensions() @property const {
     return _size;
   }
