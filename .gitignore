@@ -15,6 +15,7 @@ lib/blend2d/
 
 # Executables
 bin/gooey-test-library
+bin/gooey-test-software-renderer
 *.exe
 
 # DUB
