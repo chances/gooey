@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://127.0.0.1/index.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/events.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/rasterization.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/rasterization/Rasterizer.html</loc></url>
+<url><loc>http://127.0.0.1/gooey.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/ImageFormat.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/Surface.html</loc></url>
+<url><loc>http://127.0.0.1/gooey/Surface.dimensions.html</loc></url>
 </urlset>
