@@ -14,14 +14,14 @@ jobs:
       uses: dlang-community/setup-dlang@v1
       with:
         compiler: ldc-latest
-    - name: Cache DUB Artifacts (Posix)
-      if: runner.os == 'Linux' || runner.os == 'macOS'
-      uses: actions/cache@v2
-      with:
-        path: ~/.dub
-        key: ${{ runner.os }}-dub-${{ hashFiles('**/dub.json') }}
-        restore-keys: |
-          ${{ runner.os }}-dub-
+    # - name: Cache DUB Artifacts (Posix)
+    #   if: runner.os == 'Linux' || runner.os == 'macOS'
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ~/.dub
+    #     key: ${{ runner.os }}-dub-${{ hashFiles('**/dub.json') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-dub-
     - name: Lint
       id: lint
       run: dub lint
