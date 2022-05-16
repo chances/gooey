@@ -6,7 +6,7 @@
       "type": "lldb",
       "request": "launch",
       "name": "Debug Unit Tests",
-      "program": "${workspaceFolder}/bin/gooey-test-library",
+      "program": "${workspaceFolder}/bin/gooey-test-software-renderer",
       "args": [],
       "cwd": "${workspaceFolder}"
     }
