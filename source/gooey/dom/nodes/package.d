@@ -20,15 +20,11 @@ abstract class Node {
   ///
   this() { assert(0, "Use `Document.createElement`"); }
   ///
-  package(gooey.dom) this(string nodeName = null) {
-    this.nodeName_ = nodeName;
-  }
-  ///
   package(gooey.dom) this(Document owner, Node parent = null) {
     this(null, owner, parent);
   }
   ///
-  package(gooey.dom) this(string nodeName, Document owner, Node parent = null) {
+  package(gooey.dom) this(string nodeName, Document owner = null, Node parent = null) {
     this.nodeName_ = nodeName;
     this.ownerDocument_ = owner;
     this.parent_ = parent;
@@ -146,11 +142,13 @@ private bool implementsInterface(T)(Node a, Node b) {
 
 ///
 interface CharacterData {
+  ///
   static string data;
 }
 
 ///
 class Comment : Node, CharacterData {
+  ///
   static string data;
 
   ///
@@ -162,6 +160,7 @@ class Comment : Node, CharacterData {
 
 ///
 @safe class Text : Node, CharacterData {
+  ///
   static string data;
 
   ///
@@ -173,6 +172,7 @@ class Comment : Node, CharacterData {
 
 ///
 class ScriptNode : Node {
+  ///
   static string contents;
 
   ///
@@ -184,6 +184,7 @@ class ScriptNode : Node {
 
 ///
 class StyleNode : Node {
+  ///
   static string contents;
 
   ///

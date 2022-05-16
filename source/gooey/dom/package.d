@@ -55,6 +55,7 @@ class Document : Node {
   }
   /// ditto
   void title(string value) const @property {
+    assert(value.length);
     // TODO: https://github.com/chances/surf/blob/d6804df516f8acfff569651634eb9ae59d3ae9dc/xavierHTML/DOM/Document.cs#L65-L84
   }
 

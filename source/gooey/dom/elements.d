@@ -94,7 +94,8 @@ abstract class Element : Node {
 
   ///
   Element[] elementsByTagName(string qualifiedName) {
-    assert(0, "Not implemented.");
+    assert(qualifiedName.length || false, "Not implemented.");
+    return [];
   }
 }
 
@@ -105,6 +106,7 @@ class HtmlElement : Element {
   }
 }
 
+///
 static htmlElementsWithPlainInterfaces = [
   "dd", "dt", "ruby", "rp", "rt", "span", "em", "mark"
 ];
