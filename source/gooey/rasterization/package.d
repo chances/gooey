@@ -5,3 +5,5 @@ module gooey.rasterization;
 
 ///
 interface Rasterizer {}
+
+// TODO: Use descartes to model objects for rasterized painting? See https://github.com/chances/descartes-d#readme
