@@ -9,21 +9,38 @@
   "targetType": "staticLibrary",
   "targetPath": "bin",
   "sourcePaths": [ "source" ],
+  "excludedSourceFiles": [
+    "source/events/**/*.d"
+  ],
 	"dependencies": {
-		"bindbc-blend2d": "~>0.0.1127",
-		"libasync": "~>0.8.6",
+    "eventcore": "~>0.9.20",
 		"libdominator": "~>1.1.7",
 		"pegged": "~>0.4.5"
 	},
-  "subConfigurations": {
-    "bindbc-blend2d": "static"
-  },
-  "lflags": [
-    "-lstdc++",
-    "-Llib/blend2d/build"
-  ],
   "-ddoxFilterArgs": [
     "--min-protection=Protected",
     "--only-documented"
+  ],
+  "configurations": [
+    {
+      "name": "software-renderer",
+      "versions": ["Blend2D"],
+      "dependencies": {
+        "bindbc-blend2d": "~>0.0.1127"
+      },
+      "subConfigurations": {
+        "bindbc-blend2d": "static"
+      },
+      "preGenerateCommands-posix": [
+        "make blend2d"
+      ],
+      "lflags-posix": [
+        "-lstdc++",
+        "-Llib/blend2d/build"
+      ]
+    },
+    {
+      "name": "gpu-renderer"
+    }
   ]
 }

@@ -11,11 +11,11 @@ lib/blend2d/build/libblend2d.a: lib/blend2d/CMakeLists.txt
 	cd lib/blend2d/build && \
 	cmake .. -DBLEND2D_STATIC=true -DBLEND2D_NO_INSTALL=true && \
 	cmake --build .
-	# TODO: Fix this sanity check
-	# @echo "Sanity check for static lib:"
-	# ld -Llib/blend2d/src -l glfw3
-	# rm -f a.out
-	# @echo "👍️"
+# TODO: Fix this sanity check
+# @echo "Sanity check for static lib:"
+# ld -Llib/blend2d/src -l glfw3
+# rm -f a.out
+# @echo "👍️"
 blend2d: lib/blend2d/build/libblend2d.a
 .PHONY: blend2d
 
@@ -37,7 +37,7 @@ docs/sitemap.xml: $(SOURCES)
 	@sed -i "s/API documentation/API Reference/g" docs/index.html
 	@sed -i -e "/<h1>API Reference<\/h1>/r views/index.html" -e "/<h1>API Reference<\/h1>/d" docs/index.html
 	# License Link
-	@sed -i "s/MIT License/<a href=\"https:\/\/opensource.org\/licenses\/MIT\">MIT License<\/a>/" `find docs -name '*.html'`
+	@sed -i "s/(?<!alt=\")MIT License/<a href=\"https:\/\/opensource.org\/licenses\/MIT\">MIT License<\/a>/" `find docs -name '*.html'`
 	# Footer
 	@sed -i -e "/<p class=\"faint\">Generated using the DDOX documentation generator<\/p>/r views/footer.html" -e "/<p class=\"faint\">Generated using the DDOX documentation generator<\/p>/d" `find docs -name '*.html'`
 	@echo Done

@@ -5,143 +5,77 @@ module gooey.dom;
 
 import std.conv : to;
 
-///
-abstract class Node {
-  ///
-  Node parent;
-  ///
-  Node[] children;
-
-  ///
-  this() {}
-  ///
-  this(Node[] children) {
-    import std.algorithm : each;
-
-    this.children = children;
-    this.children.each!(node => node.parent = this);
-  }
-
-  ///
-  const(Node) firstChild() @property const {
-    if (children.length == 0) return null;
-    return children[0];
-  }
-
-  ///
-  const(Node) lastChild() @property const {
-    import std.range : tail;
-    if (children.length == 0) return null;
-    return children.tail(1)[0];
-  }
-
-  ///
-  const(Element) parentElement() @property const {
-    return parent !is null && typeid(Element).isBaseOf(parent.classinfo) ? parent.to!(const Element) : null;
-  }
-
-  ///
-  string textContent() @property const {
-    import std.algorithm : map, fold;
-
-    return children.map!(node => {
-      if (typeid(TextNode).isBaseOf(node.classinfo)) return node.to!(const TextNode).data;
-      else return node.textContent;
-    }()).fold!((a, b) => a ~ b)("");
-  }
-}
+public import gooey.dom.attributes;
+public import gooey.dom.elements;
+public import gooey.dom.nodes;
 
 ///
-class TextNode : Node {
-  ///
-  string data;
+class Document : Node {
+  package(gooey) Element documentElement_;
+  package(gooey) Element _body_;
+  package(gooey) Element head_;
+  package(gooey) auto readyState_ = DocumentReadyState.loading;
+  package(gooey) string title_;
 
   ///
-  this(string data) {
-    this.data = data;
+  this(Element documentElement = null) {
+    super(this);
+
+    if (documentElement is null) return;
+    assert(documentElement.tagName == "html");
+    documentElement = documentElement;
+    // TODO: documentElement = parse(documentElement.outerHtml);
   }
 
   ///
-  override string textContent() @property const {
-    return data ~ super.textContent;
+  Element documentElement() const @property @trusted {
+    return cast(Element) this.documentElement_;
   }
-}
+  /// ditto
+  package(gooey) void documentElement(Element value) @property @trusted {
+    this.documentElement_ = value;
+  }
 
-unittest {
-  import std.algorithm : equal;
+  ///
+  Element head() const @property @trusted {
+    return cast(Element) this.head_;
+  }
 
-  auto foo = new TextNode("foo");
-  assert(foo.textContent.equal("foo"));
+  /// Remarks: Renamed from <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/body">`body`</a> to avoid conflict with D keyword.
+  Element bodyElement() const @property @trusted {
+    return cast(Element) this._body_;
+  }
 
-  auto bar = new TextNode("bar");
-  foo.children ~= bar;
-  assert(foo.textContent.equal("foobar"));
+  ///
+  DocumentReadyState readyState() const @property {
+    return this.readyState_;
+  }
 
-  assert(new BodyElement([foo, bar]).textContent.equal("foobar"));
-  assert(new BodyElement([foo, bar, new SpanElement()]).textContent.equal("foobar"));
-  assert(new BodyElement([
-    new SpanElement([new TextNode("fizz"), new TextNode("buzz")])
-  ]).textContent.equal("fizzbuzz"));
+  ///
+  string title() const @property {
+    return this.title_;
+  }
+  /// ditto
+  void title(string value) const @property {
+    assert(value.length);
+    // TODO: https://github.com/chances/surf/blob/d6804df516f8acfff569651634eb9ae59d3ae9dc/xavierHTML/DOM/Document.cs#L65-L84
+  }
+
+  ///
+  Element createElement(const string tagName) {
+    return tagName.createHtmlElement(this).to!Element;
+  }
+  package(gooey) Element createElement(const string tagName, Node parent) @safe {
+    return tagName.createHtmlElement(this, parent).to!Element;
+  }
 }
 
 ///
-abstract class Element : Node {
+enum DocumentReadyState {
   ///
-  const(char)[] tagName;
+  loading,
   ///
-  string[string] attributes;
-  private Element[] ancestors_;
-  protected bool tabStop_;
-
+  interactive,
   ///
-  this(string tagName, Node[] children) {
-    super(children);
-    this.tagName = tagName;
-  }
-
-  ///
-  bool hasAttribute(string name) const {
-    return (name in attributes) !is null;
-  }
-
-  ///
-  auto id() @property const {
-    return "id" in attributes;
-  }
-
-  bool tabStop() @property const {
-    return tabStop_;
-  }
-}
-
-import std.typecons : Flag, No, Yes;
-
-package mixin template element(string tagName, Flag!"tabStop" tabStop = No.tabStop) {
-  import std.string : capitalize, format;
-  mixin(`class %sElement : Element {
-    this() { this([]); }
-    this(Node[] children) {
-      super(tagName.to!string, children);
-      this.tabStop_ = %s;
-    }
-  }`.format(tagName.capitalize, tabStop.to!bool.to!string));
-}
-
-mixin element!"html";
-mixin element!"head";
-mixin element!"body";
-mixin element!"span";
-mixin element!("button", Yes.tabStop);
-
-unittest {
-  import std.algorithm : equal;
-
-  auto span = new SpanElement();
-  assert(span.id == null);
-  assert(span.hasAttribute("id") == false);
-  assert(span.tabStop == false);
-  assert(new ButtonElement().tabStop);
-
-  assert(new BodyElement([span]).firstChild.parentElement !is null);
-  assert(new BodyElement([span, new TextNode("foo")]).lastChild.textContent.equal("foo"));
+  complete,
 }

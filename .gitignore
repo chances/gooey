@@ -16,6 +16,7 @@ lib/blend2d/
 # Executables
 bin/gen-css-parser
 bin/gooey-test-library
+bin/gooey-test-software-renderer
 *.exe
 
 # DUB

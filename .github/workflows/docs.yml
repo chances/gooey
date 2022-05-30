@@ -16,6 +16,14 @@ jobs:
         uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
+      - name: Cache Blend2D Artifacts (Posix)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        uses: actions/cache@v2
+        with:
+          path: lib/blend2d
+          key: ${{ runner.os }}-blend2d-${{ hashFiles('lib/blend2d/build/**/*.*') }}
+          restore-keys: |
+            ${{ runner.os }}-blend2d-
       - name: Build Documentation
         run: make docs
       - name: GitHub Pages

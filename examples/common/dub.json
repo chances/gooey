@@ -1,0 +1,26 @@
+{
+  "name": "examples",
+  "description": "Common infra and utils for gooey examples",
+  "license": "MIT",
+  "copyright": "Copyright © 2022, Chance Snow",
+	"authors": [
+		"Chance Snow <hello@chancesnow.me>"
+	],
+  "targetType": "sourceLibrary",
+	"dependencies": {
+		"gooey": {
+      "path": "../.."
+    }
+	},
+  "configurations": [
+    {
+      "name": "headless"
+    },
+    {
+      "name": "windowed",
+      "subConfigurations": {
+        "wgpu-d": "glfw"
+      }
+    }
+  ]
+}
