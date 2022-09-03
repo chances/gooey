@@ -66,7 +66,7 @@ Attr attribute;
 enum initialMode = InsertionMode.beforeHtml;
 auto mode = initialMode;
 /// Full history of parse modes from start to finish.
-version(unittest) InsertionMode[] modes = [initialMode];
+debug InsertionMode[] modes = [initialMode];
 auto scripting = false;
 string[] tagStack = [];
 string selfClosingTag;
@@ -366,7 +366,7 @@ Document parse(string input) {
   doc.documentElement_.children_ ~= doc.head_ = new HtmlHeadElement(doc, doc.documentElement_);
   doc.documentElement_.children_ ~= doc._body_ = new HtmlBodyElement(doc, doc.documentElement_);
 
-  // Parse input document
+  // Parse input document, performing node insertion actions from the HTML grammar
   debug diagnostics = [];
   const ast = HTML(input);
   const errorMessage = ast.unexpectedError ~ ": " ~ ast.failMsg(formatFailMsg);
@@ -398,11 +398,11 @@ version(unittest) {
 unittest {
   const fragment = parse("<body><p></body>").assertNotThrown!ParseException;
   assert( fragment.bodyElement !is null);
-  assert( fragment.bodyElement.nodeName.equal("body"), "Root node is not body");
+  assert( fragment.bodyElement.nodeName.equal("Body"), "Root node is not body");
   assert(!fragment.bodyElement.children.empty, "Body has no children:\n\n" ~ parserDiagnositics);
   assert(
-    fragment.bodyElement.firstChild.nodeName.equal("p"),
-    "Root node is not p, but " ~ fragment.bodyElement.firstChild.nodeName ~ "\n\n" ~ parserDiagnositics
+    fragment.bodyElement.firstChild.nodeName.equal("P"),
+    "Root node is not p.\n\n" ~ parserDiagnositics
   );
 }
 
@@ -427,16 +427,15 @@ unittest {
 </div>`;
   const document = parse(html).assertNotThrown!ParseException;
   assert(document.bodyElement !is null);
-  assert(document.bodyElement.nodeName.equal("body"), "Root node is not body");
+  assert(document.bodyElement.nodeName.equal("Body"), "Root node is not body");
   assert(document.bodyElement.children.length > 0, parserDiagnositics);
   assert(
-    document.bodyElement.firstChild.nodeName.equal("div"),
-    "Body's first child is not `p`, but `" ~ document.bodyElement.firstChild.nodeName ~ '`'
+    document.bodyElement.firstChild.nodeName.equal("Div"),
+    "Body's first child is not `div`.\n\n" ~ parserDiagnositics
   );
   assert(document.bodyElement.firstChild.children.length > 0, "Main division has no children:\n" ~ parserDiagnositics);
   assert(
-    document.bodyElement.firstChild.firstChild.nodeName.equal("p"),
-    "Main division's first child is not `p`, but `" ~ document.bodyElement.firstChild.nodeName ~ "`\n\n" ~
-    parserDiagnositics
+    document.bodyElement.firstChild.firstChild.nodeName.equal("P"),
+    "Main division's first child is not `p`.\n\n" ~ parserDiagnositics
   );
 }

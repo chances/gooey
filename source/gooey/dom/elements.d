@@ -123,7 +123,7 @@ unittest {
   assert(new HtmlButtonElement().tabStop);
 
   auto body_ = new HtmlBodyElement();
-  body_.children_ ~= [span];
+  body_.appendChild(span);
   assert(body_.firstChild.parentElement !is null);
 
   body_ = new HtmlBodyElement();
@@ -187,12 +187,11 @@ class HtmlTableCellElement : HtmlElement {
   }
 }
 
-///
-class HtmlElementOf(string staticTagName, Flag!"tabStop" tabStop = No.tabStop) : HtmlElement {
+package class HtmlElementOf(string staticTagName, Flag!"tabStop" staticTabStop = No.tabStop) : HtmlElement {
   ///
-  this() @safe { super(staticTagName); }
+  this() @safe { super(staticTagName, null, null, staticTabStop); }
   package(gooey) @safe this(Document owner = null, Node parent = null) {
-    super(staticTagName, owner, parent, tabStop);
+    super(staticTagName, owner, parent, staticTabStop);
   }
 }
 
