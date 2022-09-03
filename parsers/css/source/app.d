@@ -90,7 +90,7 @@ void main()
     ex  <- ~(number 'ex'i)    # x-height
     rem <- ~(number 'rem'i)   # Relative EMs
     percent <- ~(number '%')
-    length <- ~(number ('px'i / 'cm'i / 'mm'i / 'in_'i / 'pt'i / 'pc'i))
+    length <- ~(number ('px'i / 'cm'i / 'mm'i / 'in_'i / 'pt'i / 'pc'i / 'vw'i / 'vh'i))
     angle <- ~(number ('deg'i / 'rad'i / 'grad'i))
     time <- ~(number ('ms'i / 's'i))
     frequency <- ~(number ('hz'i / 'khz'i))

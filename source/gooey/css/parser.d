@@ -101,7 +101,7 @@ struct GenericCSS(TParseTree) {
       }
     }
 
-    static void addRuleBefore(string parentRule, string ruleSyntax) {
+    static void addRuleBefore(string parentRule, string ruleSyntax) @trusted {
       // enum name is the current grammar name
       DynamicGrammar dg = pegged.dynamic.grammar.grammar(
         name ~ ": " ~ ruleSyntax,
@@ -113,7 +113,7 @@ struct GenericCSS(TParseTree) {
       before[parentRule] = rules[dg.startingRule];
     }
 
-    static void addRuleAfter(string parentRule, string ruleSyntax) {
+    static void addRuleAfter(string parentRule, string ruleSyntax) @trusted {
       // enum name is the current grammar named
       DynamicGrammar dg = pegged.dynamic.grammar.grammar(
         name ~ ": " ~ ruleSyntax,
@@ -1950,7 +1950,8 @@ struct GenericCSS(TParseTree) {
         return pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(
             pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg
             .caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg
-            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length")(
+            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc"), pegged.peg
+            .caseInsensitiveLiteral!("vw"), pegged.peg.caseInsensitiveLiteral!("vh")))), "CSS.length")(
           p);
       } else {
         if (auto m = tuple(`length`, p.end) in memo)
@@ -1959,7 +1960,8 @@ struct GenericCSS(TParseTree) {
           TParseTree result = hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(
               pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg
               .caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg
-              .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length"), "length")(
+              .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc"), pegged.peg
+              .caseInsensitiveLiteral!("vw"), pegged.peg.caseInsensitiveLiteral!("vh")))), "CSS.length"), "length")(
             p);
           memo[tuple(`length`, p.end)] = result;
           return result;
@@ -1972,14 +1974,16 @@ struct GenericCSS(TParseTree) {
         return pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(
             pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg
             .caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg
-            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length")(TParseTree("", false, [
+            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc"), pegged.peg
+            .caseInsensitiveLiteral!("vw"), pegged.peg.caseInsensitiveLiteral!("vh")))), "CSS.length")(TParseTree("", false, [
             ], s));
       } else {
         forgetMemo();
         return hooked!(pegged.peg.defined!(pegged.peg.fuse!(pegged.peg.and!(number, pegged.peg.or!(
             pegged.peg.caseInsensitiveLiteral!("px"), pegged.peg.caseInsensitiveLiteral!("cm"), pegged.peg
             .caseInsensitiveLiteral!("mm"), pegged.peg.caseInsensitiveLiteral!("in_"), pegged.peg
-            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc")))), "CSS.length"), "length")(
+            .caseInsensitiveLiteral!("pt"), pegged.peg.caseInsensitiveLiteral!("pc"), pegged.peg
+            .caseInsensitiveLiteral!("vw"), pegged.peg.caseInsensitiveLiteral!("vh")))), "CSS.length"), "length")(
           TParseTree("", false, [], s));
       }
     }

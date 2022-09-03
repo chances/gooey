@@ -98,7 +98,10 @@ unittest {
 }
 
 /// Unit of measurement for a <a href="https://drafts.csswg.org/css2/#length-units">CSS Length</a>.
-/// See_Also: <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification
+/// See_Also: $UL(
+///   $(LI <a href="https://drafts.csswg.org/css2/#length-units">Lengths</a> - CSS 2 Specification)
+///   $(LI <a href="https://www.w3.org/TR/css-values-3/#viewport-relative-lengths">Viewport-percentage lengths</a> - CSS Values Level 3 Specification)
+/// )
 enum Unit {
   ///
   unitless,
@@ -124,9 +127,15 @@ enum Unit {
   picas,
   /// Equal to 0.75pt.
   pixels,
-  ///
+  /// Equal to 1% of the width of the initial containing block.
+  /// See_Also: <a href="https://www.w3.org/TR/css-values-3/#vw">`vw` unit</a> - Viewport-percentage lengths - CSS Values Level 3
+  vw,
+  /// Equal to 1% of the height of the initial containing block.
+  /// See_Also: <a href="https://www.w3.org/TR/css-values-3/#vh">`vh` unit</a> - Viewport-percentage lengths - CSS Values Level 3
+  vh,
+  /// Degrees. There are 360 degrees in a full circle.
   degrees,
-  ///
+  /// Radians. There are 2π radians in a full circle.
   radians,
 }
 
@@ -155,6 +164,10 @@ string getName(Unit unit) @property {
       return "Picas";
     case Unit.pixels:
       return "Pixels";
+    case Unit.vw:
+      return "Viewport-related Width Percentage";
+    case Unit.vh:
+      return "Viewport-related Height Percentage";
     case Unit.degrees:
       return "Degrees";
     case Unit.radians:
@@ -189,6 +202,10 @@ string notation(Unit unit) @property {
       return "pc";
     case Unit.pixels:
       return "px";
+    case Unit.vw:
+      return "vw";
+    case Unit.vh:
+      return "vh";
     case Unit.degrees:
       return "deg";
     case Unit.radians:
@@ -297,6 +314,8 @@ unittest {
   assert(new Length(1.5, Unit.rem).toString().equal("1.5 Relative Ems (rem)"));
   assert(new Length(12, Unit.points).toString().equal("12 Points (pt)"));
   assert(new Length(-4, Unit.pixels).toString().equal("-4 Pixels (px)"));
+  assert(new Length(25, Unit.vw).toString().equal("25 Viewport-related Width Percentage (vw)"));
+  assert(new Length(100, Unit.vh).toString().equal("100 Viewport-related Height Percentage (vh)"));
   assert(new Length(12, Unit.degrees).toString().equal("12 Degrees (deg)"));
   import std.math : PI;
   assert(new Length(PI, Unit.radians).toString().equal("3.14159 Radians (rad)"));
@@ -353,6 +372,7 @@ unittest {
   auto foobar = String.parse("'foobar'");
   assert(foobar.value.equal("foobar"));
   assert(foobar.toCSS.equal("\"foobar\""));
+  assert(foobar.toString.equal("\"foobar\""));
 }
 
 /// A reserved intentifier.
