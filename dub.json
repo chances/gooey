@@ -14,7 +14,6 @@
   ],
 	"dependencies": {
     "eventcore": "~>0.9.20",
-		"libdominator": "~>1.1.7",
 		"pegged": "~>0.4.5"
 	},
   "-ddoxFilterArgs": [
