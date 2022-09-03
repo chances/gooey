@@ -53,7 +53,7 @@ ParseTree decimate(T)(ParseTree node) {
     import std.array : join;
     import std.stdio : writeln;
 
-    writeln(node.successful ? simplifiedAst.toString() : [node.name, node.failMsg()].join(": "));
+    if (!node.successful) writeln([node.name, node.failMsg()].join(": "));
   }
   return simplifiedAst;
 }
