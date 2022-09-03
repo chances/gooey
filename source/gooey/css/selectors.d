@@ -129,6 +129,8 @@ class SimpleSelector : Selector {
   const string[] classes;
 
   ///
+  this(string elementName, string[] classes = [], ParseTree* node = null) { this(elementName, null, classes); }
+  ///
   this(string[] classes, ParseTree* node = null) { this(null, null, classes); }
   ///
   this(string elementName, string id, string[] classes, const Position* position = null) {
@@ -180,13 +182,17 @@ unittest {
   assert(hashOf(anchorSelector.elementName) == hashOf("a"));
   assert(anchorSelector.hasClass("hidden") == false);
 
+  const navbarSelector = new SimpleSelector("nav", ["navbar"]);
+  assert(navbarSelector.hasClass("navbar"));
+
   string[] classes = ["navbar", "hidden"];
-  const hiddenNavbarSelector = new SimpleSelector(classes);
+  const hiddenNavbarSelector = new SimpleSelector("nav", classes);
   assert( hiddenNavbarSelector.hasClass("navbar"));
   assert( hiddenNavbarSelector.hasClass("hidden"));
   assert(!hiddenNavbarSelector.hasClass("shake"));
 
   assert(anchorSelector < hiddenNavbarSelector);
+  assert(navbarSelector < hiddenNavbarSelector);
   assert(anchorSelector.toHash() != hiddenNavbarSelector.toHash());
   assert(anchorSelector.specificity != hiddenNavbarSelector.specificity);
 }
