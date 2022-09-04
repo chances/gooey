@@ -62,14 +62,19 @@ abstract class Selector : Node, Parsable!Selector {
     string id = null;
     string elementName = null;
     string[] classes;
+    string[] pseudoClasses;
+    string[] attributes;
     foreach (node; selector.children) {
       if (node.isNamed(&CSS.hash)) id = node.matches[1..$].join();
       else if (node.isNamed(&CSS.elementName)) elementName = node.match();
       else if (node.isNamed(&CSS.class_)) classes ~= node.matches[1..$].join();
+      else if (node.isNamed(&CSS.attribute)) attributes ~= node.matches[1..$].join();
+      // TODO: Differentiate between pseudo-elements and pseudo-classes
+      else if (node.isNamed(&CSS.pseudo)) pseudoClasses ~= node.matches[1..$].join();
     }
 
     const position = position(ast);
-    return new SimpleSelector(elementName, id, classes, &position);
+    return new SimpleSelector(elementName, id, classes, pseudoClasses, attributes, &position);
   }
 
   override int opCmp(const Object o) const {
@@ -80,6 +85,7 @@ abstract class Selector : Node, Parsable!Selector {
   }
 
   bool opEquals()(auto ref const Selector s) const {
+    // FIXME: Incorporate *all* of the selector's properties
     return this.opCmp(s) == 0;
   }
 
@@ -109,6 +115,9 @@ unittest {
   auto widget = assertNotThrown!SyntaxError(Selector.parse("#myWidget.hidden"));
   assert(widget.to!SimpleSelector.id.equal("myWidget"));
   assert(widget.to!SimpleSelector.classes.equal(["hidden"]));
+
+  auto hoveredButton = assertNotThrown!SyntaxError(Selector.parse("button:hover"));
+  assert(hoveredButton.to!SimpleSelector.pseudoClasses.equal(["hover"]));
 }
 
 // TODO: The elements of the document tree that match a selector are called subjects.
@@ -127,15 +136,23 @@ class SimpleSelector : Selector {
   const string id;
   ///
   const string[] classes;
+  ///
+  const string[] pseudoClasses;
+  ///
+  const string[] attributes;
 
   ///
-  this(string elementName, string[] classes = [], ParseTree* node = null) { this(elementName, null, classes); }
+  this(string elementName, string[] classes = [], ParseTree* node = null) { this(elementName, null, classes, [], []); }
   ///
-  this(string[] classes, ParseTree* node = null) { this(null, null, classes); }
+  this(string[] classes, ParseTree* node = null) { this(null, null, classes, [], []); }
   ///
-  this(string elementName, string id, string[] classes, const Position* position = null) {
+  this(
+    string elementName, string id, string[] classes = [], string[] pseudoClasses = [], string[] attributes = [],
+    const Position* position = null
+  ) {
     super(
       Specificity(
+        false,
         elementName is null ? 0 : 1,
         id is null ? 0 : 1,
         classes.length.to!uint
@@ -145,16 +162,18 @@ class SimpleSelector : Selector {
     this.elementName = elementName;
     this.id = id;
     this.classes = classes;
+    this.pseudoClasses = pseudoClasses;
+    this.attributes = attributes;
   }
 
   /// Instantiate a new simple selector given an element's name.
   static fromTag(string elementName) {
-    return new SimpleSelector(elementName, null, new string[0]);
+    return new SimpleSelector(elementName);
   }
 
   /// Instantiate a new simple selector given an element's ID.
   static fromId(string id) {
-    return new SimpleSelector(null, id, new string[0]);
+    return new SimpleSelector(null, id);
   }
 
   /// Whether this is the universal selector, i.e. it matches any single element in the document.
