@@ -150,7 +150,16 @@ static htmlElementsWithPlainInterfaces = [
 
 alias HtmlHtmlElement = HtmlElementOf!"html";
 alias HtmlHeadElement = HtmlElementOf!"head";
+alias HtmlBaseElement = HtmlElementOf!"base";
+alias HtmlBasefontElement = HtmlElementOf!"basefont";
+alias HtmlBgsoundElement = HtmlElementOf!"bgsound";
+alias HtmlLinkElement = HtmlElementOf!"link";
+alias HtmlMetaElement = HtmlElementOf!"meta";
 alias HtmlTitleElement = HtmlElementOf!"title";
+alias HtmlNoscriptElement = HtmlElementOf!"noscript";
+alias HtmlNoframesElement = HtmlElementOf!"noframes";
+alias HtmlStyleElement = HtmlElementOf!"style";
+alias HtmlTemplateElement = HtmlElementOf!"template";
 alias HtmlBodyElement = HtmlElementOf!"body";
 alias HtmlBrElement = HtmlElementOf!"br";
 alias HtmlAnchorElement = HtmlElementOf!"a";
@@ -207,7 +216,16 @@ package(gooey.dom) TypeInfo_Class htmlElementInterface(string tagName) @property
   switch (tagName) {
     case "html":      return typeid(HtmlHtmlElement);
     case "head":      return typeid(HtmlHeadElement);
+    case "base":      return typeid(HtmlBaseElement);
+    case "basefont":  return typeid(HtmlBasefontElement);
+    case "bgsound":   return typeid(HtmlBgsoundElement);
+    case "link":      return typeid(HtmlLinkElement);
+    case "meta":      return typeid(HtmlMetaElement);
     case "title":     return typeid(HtmlTitleElement);
+    case "noscript":  return typeid(HtmlNoscriptElement);
+    case "noframes":  return typeid(HtmlNoframesElement);
+    case "style":     return typeid(HtmlStyleElement);
+    case "template":  return typeid(HtmlTemplateElement);
     case "body":      return typeid(HtmlBodyElement);
     case "br":        return typeid(HtmlBrElement);
     case "a":         return typeid(HtmlAnchorElement);
@@ -237,7 +255,16 @@ package(gooey) HtmlElement createHtmlElement(const string tagName, Document owne
   switch (tagName) {
     case "html":      return new HtmlHtmlElement(owner, parent);
     case "head":      return new HtmlHeadElement(owner, parent);
+    case "base":      return new HtmlBaseElement(owner, parent);
+    case "basefont":  return new HtmlBasefontElement(owner, parent);
+    case "bgsound":   return new HtmlBgsoundElement(owner, parent);
+    case "link":      return new HtmlLinkElement(owner, parent);
+    case "meta":      return new HtmlMetaElement(owner, parent);
     case "title":     return new HtmlTitleElement(owner, parent);
+    case "noscript":  return new HtmlNoscriptElement(owner, parent);
+    case "noframes":  return new HtmlNoframesElement(owner, parent);
+    case "style":     return new HtmlStyleElement(owner, parent);
+    case "template":  return new HtmlTemplateElement(owner, parent);
     case "body":      return new HtmlBodyElement(owner, parent);
     case "br":        return new HtmlBrElement(owner, parent);
     case "a":         return new HtmlAnchorElement(owner, parent);

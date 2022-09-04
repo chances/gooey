@@ -396,7 +396,8 @@ version(unittest) {
 }
 
 unittest {
-  const fragment = parse("<body><p></body>").assertNotThrown!ParseException;
+  const fragment = parse("<head></head><body><p></body>").assertNotThrown!ParseException;
+  assert( fragment.head !is null);
   assert( fragment.bodyElement !is null);
   assert( fragment.bodyElement.nodeName.equal("Body"), "Root node is not body");
   assert(!fragment.bodyElement.children.empty, "Body has no children:\n\n" ~ parserDiagnositics);
