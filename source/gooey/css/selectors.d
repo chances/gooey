@@ -11,16 +11,21 @@ import gooey.css : SyntaxError;
 
 /// See_Also: <a href="https://drafts.csswg.org/css2/#specificity">Calculating a selector’s specificity</a> - CSS 2 Specification
 struct Specificity {
-  /// Whether a `Selector` selects for an element.
-  const uint elementParts;
+  /// Whether a `Declaration` is from a HTML `style` attribute.
+  const bool fromStyleAttribute;
   /// Whether a `Selector` selects for an ID.
   const uint idParts;
   /// Number of selected class names selected by a `Selector`.
   const uint classParts;
+  /// Whether a `Selector` selects for an element.
+  const uint elementParts;
 
   /// Total calculated specificity weight of a `Selector`.
   auto total() @property const {
-    return elementParts + idParts + classParts;
+    const a = fromStyleAttribute ? 1000 : 0;
+    const b = idParts * 100;
+    const c = classParts * 10;
+    return a + b + c + elementParts;
   }
 
   int opCmp(ref const Specificity s) const {
