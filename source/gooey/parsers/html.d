@@ -233,6 +233,7 @@ O appendText(O)(O o) @safe {
 
 O appendScript(O)(O o) @safe {
   const content = o.matches.joiner.to!string;
+  // TODO: Replace this `ScriptNode` with a new instance of `HtmlScriptElement`, then delete `ScriptNode`
   if (o.successful) parent.children_ ~= new ScriptNode(content, doc);
   return o;
 }

@@ -196,6 +196,14 @@ class HtmlTableCellElement : HtmlElement {
   }
 }
 
+/// Allows authors to include dynamic script and data blocks in their documents.
+/// See_Also: https://html.spec.whatwg.org/multipage/scripting.html#htmlscriptelement
+class HtmlScriptElement : HtmlElement {
+  package(gooey) this(Document owner = null, Node parent = null) {
+    super("script", owner, parent);
+  }
+}
+
 package class HtmlElementOf(string staticTagName, Flag!"tabStop" staticTabStop = No.tabStop) : HtmlElement {
   ///
   this() @safe { super(staticTagName, null, null, staticTabStop); }
@@ -225,6 +233,7 @@ package(gooey.dom) TypeInfo_Class htmlElementInterface(string tagName) @property
     case "noscript":  return typeid(HtmlNoscriptElement);
     case "noframes":  return typeid(HtmlNoframesElement);
     case "style":     return typeid(HtmlStyleElement);
+    case "script":    return typeid(HtmlScriptElement);
     case "template":  return typeid(HtmlTemplateElement);
     case "body":      return typeid(HtmlBodyElement);
     case "br":        return typeid(HtmlBrElement);
@@ -264,6 +273,7 @@ package(gooey) HtmlElement createHtmlElement(const string tagName, Document owne
     case "noscript":  return new HtmlNoscriptElement(owner, parent);
     case "noframes":  return new HtmlNoframesElement(owner, parent);
     case "style":     return new HtmlStyleElement(owner, parent);
+    case "script":    return new HtmlScriptElement(owner, parent);
     case "template":  return new HtmlTemplateElement(owner, parent);
     case "body":      return new HtmlBodyElement(owner, parent);
     case "br":        return new HtmlBrElement(owner, parent);
