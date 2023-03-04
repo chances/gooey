@@ -71,7 +71,7 @@ auto scripting = false;
 string[] tagStack = [];
 string selfClosingTag;
 debug string[] diagnostics;
-/// Set of HTML tags that may be abiguiously self-closing.
+/// Set of HTML tags that may be ambiguously self-closing.
 const selfClosingTags = [
   "br",
   "dd",
@@ -138,7 +138,7 @@ O tagOpen(O)(O o) @trusted {
     return o;
   }
   // TODO: https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
-  // Don't push ambiguiously self-closing tags
+  // Don't push ambiguously self-closing tags
   if (!selfClosingTags.canFind(tag)) {
     tagStack ~= tag;
     enforce!ParseException(
@@ -156,7 +156,7 @@ O tagClose(O)(O o) @trusted {
 
   const tag = o.currentTag;
   debug diagnostics ~= "Closing tag `" ~ tag ~ "` in mode " ~ mode.text;
-  // Don't pop ambiguiously self-closing tags
+  // Don't pop ambiguously self-closing tags
   if (!selfClosingTags.canFind(tag)) {
     const closingTagMismatch = tagStack.empty || tag != tagStack.back;
     if (closingTagMismatch) {

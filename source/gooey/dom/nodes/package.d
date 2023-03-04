@@ -169,7 +169,7 @@ abstract class Node {
     return children_.map!(a => a.textContent).fold!((a, b) => a ~ b)("");
   }
 
-  /// Retreive the child `Node` at the given index.
+  /// Retrieve the child `Node` at the given index.
   Node opIndex(size_t index) {
     return this.children_[index];
   }

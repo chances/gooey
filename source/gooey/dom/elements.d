@@ -66,7 +66,7 @@ abstract class Element : Node {
     setAttribute(attribute.name, attribute.value);
   }
 
-  /// Retreive an attribute given its `name`.
+  /// Retrieve an attribute given its `name`.
   string opIndex(string name) const {
     const values = attributes.assocArray.get(name, []);
     if (!values.length) return null;
@@ -91,7 +91,7 @@ abstract class Element : Node {
     import std.string : strip;
 
     auto classes = attributes.assocArray.get("class", []).joiner(" ").array.to!string;
-    return  classes.splitter(' ').filter!(a => a.strip.length).array;
+    return classes.splitter(' ').filter!(a => a.strip.length).array;
   }
 
   ///
