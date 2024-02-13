@@ -1,26 +1,45 @@
 {
   "name": "gooey",
-  "description": "GUI library implementing the W3C Web Platform",
-	"authors": [
-		"Chance Snow"
-	],
+  "description": "A GUI library implementing the W3C Web Platform.",
+  "authors": [ "Chance Snow <git@chancesnow.me>" ],
   "license": "MIT",
-	"copyright": "Copyright © 2021, Chance Snow",
+  "copyright": "Copyright © 2021, Chance Snow",
   "targetType": "staticLibrary",
   "targetPath": "bin",
   "sourcePaths": [ "source" ],
+  "importPaths": [ "source", "source/gooey/parsers"],
   "excludedSourceFiles": [
     "source/events/**/*.d"
   ],
 	"dependencies": {
-    "eventcore": "~>0.9.20",
-		"pegged": "~>0.4.5"
+    "descartes": {
+      "version": "83de6514d2a5b64672a91cd544c441c98dc22dbc",
+      "repository": "git+https://github.com/chances/descartes-d.git"
+    },
+    "eventcore": "~>0.9.20"
 	},
   "-ddoxFilterArgs": [
     "--min-protection=Protected",
     "--only-documented"
   ],
+  "preGenerateCommands-posix": [
+    "meson setup build",
+    "ninja -C build"
+  ],
+  "dflags-posix": [
+    "-P-I$GOOEY_PACKAGE_DIR/subprojects/lexbor-2.3.0/source"
+  ],
+  "lflags-posix": [
+    "$GOOEY_PACKAGE_DIR/subprojects/lexbor-2.3.0/build/liblexbor_static.a",
+    "$GOOEY_PACKAGE_DIR/build/libgooey.a"
+  ],
   "configurations": [
+    {
+      "name": "library"
+    },
+    {
+      "name": "unittest"
+    },
     {
       "name": "software-renderer",
       "versions": ["Blend2D"],

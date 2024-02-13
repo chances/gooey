@@ -1,0 +1,11 @@
+[wrap-file]
+directory = lexbor-2.3.0
+
+method: cmake
+source_url = https://github.com/lexbor/lexbor/archive/refs/tags/v2.3.0.tar.gz
+source_filename = lexbor-2.3.0.tar.gz
+source_hash = 522ad446cd01d89cb870c6561944674e897f8ada523f234d5be1f8d2d7d236b7
+
+[provide]
+lexbor = lexbor_dep
+lexbor_static = lexbor_static_dep

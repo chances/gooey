@@ -3,11 +3,19 @@
 /// License: MIT License
 module gooey.css;
 
+import gooey.parsers;
+
 public {
   import gooey.ast : SyntaxError;
-  import gooey.css.parser;
   import gooey.css.selectors;
   import gooey.css.values;
+}
+
+///
+class ParseError : Exception {
+  import std.exception : basicExceptionCtors;
+
+  mixin basicExceptionCtors;
 }
 
 ///
@@ -19,6 +27,8 @@ struct Stylesheet {
   /// Throws: `SyntaxError` when an irrecoverable syntax error is encournterd.
   Stylesheet parse(string input) {
     import gooey.ast : enforceContentful;
+    import std.conv : castFrom, to;
+    import std.string : format, fromStringz;
 
     try enforceContentful(input);
     catch (SyntaxError e) {
@@ -26,7 +36,12 @@ struct Stylesheet {
       throw e;
     }
 
-    assert(0, "Unimplemented");
+    const result = gooey_css_parse_stylesheet(input.ptr, input.length);
+    if (result.error != null) throw new ParseError("Error: %s".format(result.error));
+    assert(0, result.value.toString);
+
+    auto rules = new Rule[0];
+    return Stylesheet(rules);
   }
 }
 

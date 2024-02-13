@@ -3,11 +3,11 @@
 /// License: MIT License
 module gooey.css.values;
 
-import pegged.peg : Position;
 import std.conv : to;
 import std.typecons : Flag, No;
 
 import gooey.ast;
+import gooey.parsers;
 
 /// An abstract CSS value.
 /// See_Also: $(UL
@@ -24,8 +24,7 @@ abstract class Value : Node {
   ///
   static const(Value) parse(string input) {
     import gooey.css.functions : Function;
-    import gooey.css.parser : CSS;
-    import std.algorithm : all, any, endsWith, equal, map, stripLeft, stripRight;
+    import std.algorithm : all, any, canFind, endsWith, equal, map, stripLeft, stripRight;
     import std.array : array, join;
     import std.ascii : isDigit;
     import std.conv : parse;
@@ -33,53 +32,48 @@ abstract class Value : Node {
     import std.traits : EnumMembers;
     import std.typecons : Yes;
 
-    auto term = CSS.term(input.enforceContentful()).decimate!CSS();
-    if (!term.successful) throw new SyntaxError(term);
-    assert(term.isNamed(&CSS.term) && term.children.length > 0);
-
-    if (term.firstChild.isNamed(&CSS.function_)) {
-      const func = Function.parse(term.firstChild);
-      if (func.name == "rgb" && func.parameters.length >= 3 && func.parametersAreOf!Length)
-        return new Color(
-          func.parameters[0].toColorComponent,
-          func.parameters[1].toColorComponent,
-          func.parameters[2].toColorComponent,
-        );
-      if (func.name == "rgba" && func.parameters.length >= 3 && func.parametersAreOf!Length)
-        return new Color(
-          func.parameters[0].toColorComponent,
-          func.parameters[1].toColorComponent,
-          func.parameters[2].toColorComponent,
-          func.parameters.length > 3 ? func.parameters[3].toColorComponent(Yes.isAlphaComponent) : 255,
-        );
+    if ([EnumMembers!Unit].any!(unit => unit != Unit.unitless && input.canFind(unit.notation))) {
+      auto value = input.stripRight!(c => !c.isDigit && c != '.')();
+      assert(value.length != input.length);
+      return new Length(
+        parse!double(value),
+        parseUnit(input.stripLeft!(c => c.isDigit || c == '.')())
+      );
     }
-    if (term.firstLeaf.isNamed(&CSS.string_)) return new String(term.match());
-    if (term.firstLeaf.isNamed(&CSS.identifier)) {
-      auto keyword = term.match();
-      if (colors.keys.any!(color => color.equal(keyword))()) return colors[keyword];
-      return new Keyword(keyword);
-    }
-    if (term.firstLeaf.isNamed(&CSS.hexcolor)) {
-      auto hexColor = term.match().stripLeft!(c => c == '#');
-      auto color = hexColor.length == 3
-        ? [hexColor[0], hexColor[0], hexColor[1], hexColor[1], hexColor[2], hexColor[2]]
-        : hexColor;
-      assert(color.length == 6, "Color is not a six digit hexadecimal value: " ~ color);
-      return Color.parse(color.to!uint(16));
-    }
+    if (input[0].isDigit) return new Length(parse!double(input));
 
-    auto number = term.match();
-    if (term.firstLeaf.isNamed(&CSS.number)) return new Length(parse!double(number));
+    //if (term.firstChild.isNamed(&CSS.function_)) {
+    //  const func = Function.parse(term.firstChild);
+    //  if (func.name == "rgb" && func.parameters.length >= 3 && func.parametersAreOf!Length)
+    //    return new Color(
+    //      func.parameters[0].toColorComponent,
+    //      func.parameters[1].toColorComponent,
+    //      func.parameters[2].toColorComponent,
+    //    );
+    //  if (func.name == "rgba" && func.parameters.length >= 3 && func.parametersAreOf!Length)
+    //    return new Color(
+    //      func.parameters[0].toColorComponent,
+    //      func.parameters[1].toColorComponent,
+    //      func.parameters[2].toColorComponent,
+    //      func.parameters.length > 3 ? func.parameters[3].toColorComponent(Yes.isAlphaComponent) : 255,
+    //    );
+    //}
+    //if (term.firstLeaf.isNamed(&CSS.string_)) return new String(term.match());
+    //if (term.firstLeaf.isNamed(&CSS.identifier)) {
+    //  auto keyword = term.match();
+    //  if (colors.keys.any!(color => color.equal(keyword))()) return colors[keyword];
+    //  return new Keyword(keyword);
+    //}
+    //if (term.firstLeaf.isNamed(&CSS.hexcolor)) {
+    //  auto hexColor = term.match().stripLeft!(c => c == '#');
+    //  auto color = hexColor.length == 3
+    //    ? [hexColor[0], hexColor[0], hexColor[1], hexColor[1], hexColor[2], hexColor[2]]
+    //    : hexColor;
+    //  assert(color.length == 6, "Color is not a six digit hexadecimal value: " ~ color);
+    //  return Color.parse(color.to!uint(16));
+    //}
 
-    assert([EnumMembers!Unit].map!(unit => unit.notation()).any!(unit => number.endsWith(unit))());
-    auto value = number.stripRight!(c => !c.isDigit && c != '.')();
-    assert(value.length != number.length);
-    return new Length(
-      parse!double(value),
-      parseUnit(number.stripLeft!(c => c.isDigit || c == '.')())
-    );
-
-    assert(0, "Unimplemented");
+    assert(0, "Unimplemented!");
   }
 
   float pixels() @property const {

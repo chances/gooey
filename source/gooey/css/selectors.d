@@ -3,11 +3,11 @@
 /// License: MIT License
 module gooey.css.selectors;
 
-import pegged.peg : ParseTree, Position, position;
 import std.conv : to;
 
 import gooey.ast;
 import gooey.css : SyntaxError;
+import gooey.parsers;
 
 /// See_Also: <a href="https://drafts.csswg.org/css2/#specificity">Calculating a selector’s specificity</a> - CSS 2 Specification
 struct Specificity {
@@ -55,30 +55,22 @@ abstract class Selector : Node, Parsable!Selector {
 
   /// Parse a selector given a string `input`.
   static Selector parse(string input) {
-    import gooey.css.parser : CSS, GetName;
+    import gooey.parsers : gooey_css_parse_selector, toString;
     import std.algorithm : equal;
     import std.array : join;
 
-    const ast = CSS.selector(input.enforceContentful()).decimate!CSS();
-    if (!ast.successful) throw new SyntaxError(ast);
+    const result = gooey_css_parse_selector(input.ptr, input.length);
+    assert(0, (result.error is null ? result.value : result.error).toString);
+    //const ast = result.value.deserialize;
+    //if (!ast.successful) throw new SyntaxError(ast);
 
-    assert(ast.isNamed(&CSS.selector));
-    const selector = ast.enforceChildNamed(&CSS.simpleSelector);
     string id = null;
     string elementName = null;
     string[] classes;
     string[] pseudoClasses;
     string[] attributes;
-    foreach (node; selector.children) {
-      if (node.isNamed(&CSS.hash)) id = node.matches[1..$].join();
-      else if (node.isNamed(&CSS.elementName)) elementName = node.match();
-      else if (node.isNamed(&CSS.class_)) classes ~= node.matches[1..$].join();
-      else if (node.isNamed(&CSS.attribute)) attributes ~= node.matches[1..$].join();
-      // TODO: Differentiate between pseudo-elements and pseudo-classes
-      else if (node.isNamed(&CSS.pseudo)) pseudoClasses ~= node.matches[1..$].join();
-    }
 
-    const position = position(ast);
+    const position = result.position;
     return new SimpleSelector(elementName, id, classes, pseudoClasses, attributes, &position);
   }
 
@@ -147,9 +139,9 @@ class SimpleSelector : Selector {
   const string[] attributes;
 
   ///
-  this(string elementName, string[] classes = [], ParseTree* node = null) { this(elementName, null, classes, [], []); }
+  this(string elementName, string[] classes = []) { this(elementName, null, classes, [], []); }
   ///
-  this(string[] classes, ParseTree* node = null) { this(null, null, classes, [], []); }
+  this(string[] classes) { this(null, null, classes, [], []); }
   ///
   this(
     string elementName, string id, string[] classes = [], string[] pseudoClasses = [], string[] attributes = [],
