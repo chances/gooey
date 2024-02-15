@@ -3,7 +3,24 @@
 /// License: MIT License
 module gooey.rasterization;
 
+import descartes;
+import std.conv : to;
+
 ///
 interface Rasterizer {}
 
-// TODO: Use descartes to model objects for rasterized painting? See https://github.com/chances/descartes-d#readme
+// TODO: Model objects for rasterized painting
+struct Rect {
+	float top;
+	float right;
+	float bottom;
+	float left;
+
+	float width() inout {
+		return (right - left).to!float;
+	}
+
+	float height() inout {
+		return (bottom - top).to!float;
+	}
+}
