@@ -11,10 +11,11 @@
   "excludedSourceFiles": [
     "source/events/**/*.d"
   ],
+  "systemDependencies": "meson >= 1.3.1, ninja >= 1.11.0, cmake >= 3.26.3",
 	"dependencies": {
     "descartes": {
-      "version": "83de6514d2a5b64672a91cd544c441c98dc22dbc",
-      "repository": "git+https://github.com/chances/descartes-d.git"
+      "repository": "git+https://github.com/chances/descartes-d.git",
+      "version": "83de6514d2a5b64672a91cd544c441c98dc22dbc"
     },
     "eventcore": "~>0.9.20"
 	},
@@ -22,10 +23,8 @@
     "--min-protection=Protected",
     "--only-documented"
   ],
-  "preGenerateCommands-posix": [
-    "meson setup build",
-    "ninja -C build"
-  ],
+  "preGenerateCommands-posix": [ "meson setup build" ],
+  "preBuildCommands-posix": [ "ninja -C build" ],
   "dflags-posix": [
     "-P-I$GOOEY_PACKAGE_DIR/subprojects/lexbor-2.3.0/source"
   ],
